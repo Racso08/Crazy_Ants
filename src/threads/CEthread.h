@@ -10,10 +10,9 @@
 #include <ucontext.h>
 #include "queue.h"
 
-#define QUANTUM 1000
+#define QUANTUM 10
 #define RUNNING 0
-#define CANCEL 1
-#define DONE 2
+#define DONE 1
 
 typedef int CEthread_t;
 
@@ -22,5 +21,6 @@ int CEthread_create(CEthread_t* thread, void *(*start_routine)(void *), void *ar
 void CEthread_end(void* returnValue);
 int CEthread_yield(void);
 int CEthread_join(CEthread_t thread, void **status);
+int CEthread_detach(CEthread_t thread);
 
 #endif

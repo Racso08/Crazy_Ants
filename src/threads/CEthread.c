@@ -7,6 +7,7 @@ typedef struct{
     int id;
     int join;
     int state;
+    int detach;
     void* (*proc)(void*);
     void* arg;
     void* returnValue;
@@ -31,12 +32,14 @@ void CEthread_init() {
     queueInit(&finishQueue);
 
     cethread_t* mainThread = (cethread_t*) malloc(sizeof(cethread_t));
-    mainThread->id = threadsIdCount++;
+    mainThread->id = threadsIdCount;
     mainThread->context = (ucontext_t*) malloc(sizeof(ucontext_t)); 
     memset(mainThread->context, '\0', sizeof(ucontext_t));
     mainThread->arg = NULL;
     mainThread->state = RUNNING;
-    mainThread->join - 0;    
+    mainThread->join = 0;
+    mainThread->detach = 0;
+    threadsIdCount++;
 
     if (getcontext(mainThread->context) == -1) {
       perror("Error, no se logro conseguir el contexto del hilo principal\n");
@@ -71,13 +74,16 @@ int CEthread_create(CEthread_t* thread, void *(*startFunction)(void *), void *ar
     sigprocmask(SIG_BLOCK, &vtalrm, NULL);
     
     cethread_t* newThread = malloc(sizeof(cethread_t));
-    *thread = newThread->id = threadsIdCount++;
+    *thread = threadsIdCount;
+    newThread->id = threadsIdCount;
     newThread->state = RUNNING;
     newThread->proc = startFunction;
     newThread->arg = arg;
     newThread->context = (ucontext_t*) malloc(sizeof(ucontext_t));
     newThread->join = 0;
+    newThread->detach = 0;
     memset(newThread->context, '\0', sizeof(ucontext_t));
+    threadsIdCount++;
 
     if (getcontext(newThread->context) == -1) {
       perror("Error, no se logro conseguir el contexto del hilo\n");
@@ -124,9 +130,14 @@ void CEthread_end(void* returnValue) {
     free(previousThread->context);                
     previousThread->context = NULL;
 
-    previousThread->state = DONE; 
-    previousThread->returnValue = returnValue;
+    previousThread->state = DONE;
     previousThread->join = 0;
+    previousThread->returnValue = NULL;
+
+    if (previousThread->detach == 0) {
+        previousThread->returnValue = returnValue;
+    }
+
     queueAddItem(&finishQueue, previousThread);
 
     sigprocmask(SIG_UNBLOCK, &vtalrm, NULL); 
@@ -151,18 +162,26 @@ int CEthread_yield(void) {
     return 0; 
 }
 
-int CEthread_join(CEthread_t thread, void **status) {
+int CEthread_join(CEthread_t thread, void **returnValue) {
     if (thread == currentThread->id) {
+        printf("Error, no se puede hacer un join del hilo actual\n");
         return -1;
     }
 
     cethread_t* trueThread = findThread(thread);
 
     if (trueThread == NULL) {
+        printf("Error, no se encontro el hilo\n");
         return -1;
     }
 
     if (trueThread->join == currentThread->id) {
+        printf("Error, no se puede hacer un join del hilo actual\n");
+        return -1;
+    }
+
+    if (trueThread->detach == 1) {
+        printf("Error, no se puede hacer un join de un hilo detached\n");
         return -1;
     }
 
@@ -174,16 +193,31 @@ int CEthread_join(CEthread_t thread, void **status) {
         sigprocmask(SIG_BLOCK, &vtalrm, NULL);
     }
 
-    if (status == NULL) {
+    if (returnValue == NULL) {
         return 0;
     }
 
-    if (trueThread->state == CANCEL) {
-        *status = (void*) CANCEL;
-    }
     else if (trueThread->state == DONE) {
-        *status = trueThread->returnValue;
+        *returnValue = trueThread->returnValue;
     }
+
+    return 0;
+}
+
+int CEthread_detach(CEthread_t thread) {
+    cethread_t* trueThread = findThread(thread);
+
+    if (trueThread == NULL) {
+        printf("Error, no se encontro el hilo\n");
+        return -1;
+    }
+
+    if (trueThread->state == DONE) {
+        printf("Error, el hilo ya termino su ejecucion\n");
+        return -1;
+    }
+
+    trueThread->detach = 1;
 
     return 0;
 }
@@ -227,10 +261,6 @@ void scheduler(int signal) {
     }
 
     cethread_t* nextThread = (cethread_t*) queueGetFirstItem(&readyQueue);
-    while (nextThread->state == CANCEL) {
-        queueAddItem(&finishQueue, nextThread);
-        nextThread = (cethread_t*) queueGetFirstItem(&readyQueue); 
-    }
 
     cethread_t* previousThread = currentThread;
     queueAddItem(&readyQueue, currentThread);

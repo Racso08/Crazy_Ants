@@ -7,14 +7,11 @@
 const char* g_str = "Hello World\n";
 const long g_ret = 0xF0F0F0F0;
 
-void* worker(void* arg) {
+void* test(void* arg) {
 	printf("hola2\n");
-	if (strcmp((char*) arg, g_str) != 0) {
-		fprintf(stderr, 
-				"!ERROR! Wrong argument! %p, %p\n",
-				arg, g_str);
-	}
-	return (void*) g_ret;
+	int i = (int) (__intptr_t) arg;
+	i += 1;
+	return (void*) (__intptr_t) i;
 }
 
 int main() {
@@ -22,18 +19,23 @@ int main() {
 
 	CEthread_t thread1;
 	void* returnValue;
+	int i = 1;
 
-	CEthread_create(&thread1, worker, (void*) g_str);
+	printf("%d\n", i);
+	CEthread_create(&thread1, test, (void*) (__intptr_t) i);
+	CEthread_detach(thread1);
 
 	printf("hola1\n");
+
+	for (int j = 0; j < 10000000; j++) {
+	//	printf("ah\n");
+	}
+	
+	
 	CEthread_join(thread1, &returnValue);
+	printf("%d\n", (int) (__intptr_t) returnValue);
 	printf("hola3\n");
 
-	if ((long) returnValue != g_ret) {
-		fprintf(stderr, 
-				"!ERROR! Wrong return! %ld, %ld\n",
-				(long) returnValue, g_ret);
-	}
 	printf("hola4\n");
 
 	return 0;
