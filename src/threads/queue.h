@@ -2,7 +2,7 @@
 #define QUEUE_H
 
 #include <stdlib.h>
-#include <stdlib.h>
+#include <stdio.h>
 
 typedef void* queueItem;
 
@@ -17,8 +17,10 @@ typedef struct queue{
     int count;
 }queue;
 
-void queueInit(queue *list);
+void queueInit(queue* list);
 
-void queueEnqueue(queue *list, queueItem item);
+void queueAddItem(queue* list, queueItem item);
+
+queueItem queueGetFirstItem(queue* list);
 
 #endif
