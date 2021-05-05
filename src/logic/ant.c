@@ -42,7 +42,7 @@ void addAntToQueue(ant_t* ant) {
         case 0:
             queueAddItem(&channel1RightQueue, ant);
             break;
-        case 1:0x7fffffffda0c
+        case 1:
             queueAddItem(&channel1LeftQueue, ant);
             break;
         }
