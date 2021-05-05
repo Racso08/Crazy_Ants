@@ -9,6 +9,8 @@
 #include "../threads/queue.h"
 #include "channel.h"
 
-void createAnt(int scheduler, int priority, int time, int dest, int type);
+#define MAXANTS 1000
+
+void createAnt(int channel, int priority, int time, int dest, int type);
 
 #endif

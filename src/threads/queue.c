@@ -14,17 +14,18 @@ void queueAddItem(queue* list, queueItem item) {
         node->prev = NULL;
         node->item = item;
         list->head = node;
+        list->count++;
     } else {
         queueNode* tmp = list->head;
         while (tmp->next != NULL) {
             tmp = tmp->next;
         }
-        tmp->next = node;
+        node->next = NULL;
         node->prev = tmp;
+        tmp->next = node;
         node->item = item;
+        list->count++;
     }
-
-    list->count++;
 }
 
 queueItem queueGetFirstItem(queue* list) {

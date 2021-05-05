@@ -29,11 +29,15 @@ int main() {
 	CEmutex_init(&mutex);
 
 	CEthread_t thread1;
-	void* returnValue;
+	CEthread_t thread2;
+	void* returnValue1;
+	void* returnValue2;
 	int i = 1;
+	int j = 1;
 
 	printf("%d\n", i);
 	CEthread_create(&thread1, test, (void*) (__intptr_t) i);
+	CEthread_create(&thread2, test, (void*) (__intptr_t) j);
 	//CEthread_detach(thread1);
 
 	printf("hola1\n");
@@ -45,8 +49,10 @@ int main() {
 	CEmutex_lock(&mutex);
 	//CEmutex_unlock(&mutex);
 	
-	CEthread_join(thread1, &returnValue);
-	printf("%d\n", (int) (__intptr_t) returnValue);
+	CEthread_join(thread1, &returnValue1);
+	printf("%d\n", (int) (__intptr_t) returnValue1);
+	CEthread_join(thread1, &returnValue2);
+	printf("%d\n", (int) (__intptr_t) returnValue2);
 	printf("hola4\n");
 
 	printf("hola5\n");
@@ -56,16 +62,17 @@ int main() {
 
 int main() {
 	CEthread_init();
-
 	initializeChannels();
 
-	createAnt(2, 2, 23, 1, 2);
+	createAnt(1, 4, 23, 1, 2);
+	createAnt(1, 5, 12, 1, 1);
+//	createAnt(1, 5, 5, 1, 0);
+
 
 	while (1)
 	{
-		printf("f3\n");
+		//printf("f3\n");
 	}
-	
 
 	return 0;
 }
