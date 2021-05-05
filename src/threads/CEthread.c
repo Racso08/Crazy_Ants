@@ -222,6 +222,61 @@ int CEthread_detach(CEthread_t thread) {
     return 0;
 }
 
+int CEmutex_init(CEmutex_t* mutex) {
+    sigprocmask(SIG_BLOCK, &vtalrm, NULL);  
+    queueInit(mutex);
+    sigprocmask(SIG_UNBLOCK, &vtalrm, NULL);
+    return 0;
+}
+
+int CEmutex_destroy(CEmutex_t* mutex) {
+    sigprocmask(SIG_BLOCK, &vtalrm, NULL); 
+    queueDestroy(mutex);
+    sigprocmask(SIG_UNBLOCK, &vtalrm, NULL); 
+    return 0; 
+}
+
+int CEmutex_unlock(CEmutex_t* mutex) {
+    sigprocmask(SIG_BLOCK, &vtalrm, NULL);
+    if (mutex->count == 0) {
+        sigprocmask(SIG_UNBLOCK, &vtalrm, NULL);
+        return -1;
+    }
+
+    if ((int) (__intptr_t) mutex->head->item != currentThread->id) {
+       sigprocmask(SIG_UNBLOCK, &vtalrm, NULL);
+       return -1;
+    }
+
+    queueGetFirstItem(mutex);
+    sigprocmask(SIG_UNBLOCK, &vtalrm, NULL); 
+    return 0; 
+}
+
+int CEmutex_lock(CEmutex_t* mutex) {
+    sigprocmask(SIG_BLOCK, &vtalrm, NULL); 
+
+    if (mutex->count == 0) {
+        queueAddItem(mutex, (void*) (__intptr_t) currentThread->id);  
+        sigprocmask(SIG_UNBLOCK, &vtalrm, NULL);   
+        return 0;
+    }
+
+    if ((int) (__intptr_t) mutex->head->item == currentThread->id) {
+        sigprocmask(SIG_UNBLOCK, &vtalrm, NULL);
+        return 0;
+    }
+
+    queueAddItem(mutex, (void*) (__intptr_t) currentThread->id);
+    while ((int) (__intptr_t) mutex->head->item != currentThread->id) {
+        sigprocmask(SIG_UNBLOCK, &vtalrm, NULL); 
+        scheduler(SIGVTALRM);
+        sigprocmask(SIG_BLOCK, &vtalrm, NULL);
+    }
+    sigprocmask(SIG_UNBLOCK, &vtalrm, NULL);  
+    return 0; 
+}
+
 void start(void* (*startFunction)(void*), void* args) {
     sigprocmask(SIG_UNBLOCK, &vtalrm, NULL);
 

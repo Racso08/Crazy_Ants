@@ -18,9 +18,8 @@ typedef struct queue{
 }queue;
 
 void queueInit(queue* list);
-
 void queueAddItem(queue* list, queueItem item);
-
 queueItem queueGetFirstItem(queue* list);
+void queueDestroy(queue* list);
 
 #endif

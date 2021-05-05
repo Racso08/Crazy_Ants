@@ -51,3 +51,11 @@ queueItem queueGetFirstItem(queue* list) {
         return item;
     }
 }
+
+void queueDestroy(queue* list) {
+    while(list->count != 0) {
+        queueGetFirstItem(list);
+    }
+    free(list);
+    return;
+}
