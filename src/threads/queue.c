@@ -14,7 +14,6 @@ void queueAddItem(queue* list, queueItem item) {
         node->prev = NULL;
         node->item = item;
         list->head = node;
-        list->count++;
     } else {
         queueNode* tmp = list->head;
         while (tmp->next != NULL) {
@@ -23,8 +22,9 @@ void queueAddItem(queue* list, queueItem item) {
         tmp->next = node;
         node->prev = tmp;
         node->item = item;
-        list->count++;
     }
+
+    list->count++;
 }
 
 queueItem queueGetFirstItem(queue* list) {
@@ -39,17 +39,13 @@ queueItem queueGetFirstItem(queue* list) {
 
     list->head = list->head->next;
 
-    if (list->count == 1) {
-        free(tmp);
-        list->count--;
-        return item;
+    if (list->count > 1) {
+        list->head->prev = NULL;   
     }
-    else {
-        list->head->prev = NULL;
-        free(tmp);
-        list->count--;
-        return item;
-    }
+
+    free(tmp);
+    list->count--;
+    return item;
 }
 
 void queueDestroy(queue* list) {

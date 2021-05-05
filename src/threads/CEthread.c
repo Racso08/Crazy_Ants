@@ -2,23 +2,6 @@
 
 #include "CEthread.h"
 
-typedef struct{
-    ucontext_t* context;
-    int id;
-    int join;
-    int state;
-    int detach;
-    void* (*proc)(void*);
-    void* arg;
-    void* returnValue;
-} cethread_t;
-
-int threadsIdCount;
-queue readyQueue, finishQueue;
-cethread_t* currentThread;
-sigset_t vtalrm;
-static struct itimerval timer;
-
 void initialize();
 void start(void* (*startFunction)(void*), void* args);
 cethread_t* findThread(CEthread_t thread);

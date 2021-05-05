@@ -3,8 +3,10 @@
 #include <string.h>
 
 #include "threads/CEthread.h"
+#include "logic/ant.h"
+#include "logic/channel.h"
 
-CEmutex_t mutex;
+/*CEmutex_t mutex;
 
 void* test(void* arg) {
 	printf("hola2\n");
@@ -48,6 +50,22 @@ int main() {
 	printf("hola4\n");
 
 	printf("hola5\n");
+
+	return 0;
+}*/
+
+int main() {
+	CEthread_init();
+
+	initializeChannels();
+
+	createAnt(2, 2, 23, 1, 2);
+
+	while (1)
+	{
+		printf("f3\n");
+	}
+	
 
 	return 0;
 }
