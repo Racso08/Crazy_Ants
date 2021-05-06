@@ -1,6 +1,9 @@
+#define _POSIX_C_SOURCE 199309L
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
+#include <time.h>
 
 #include "threads/CEthread.h"
 #include "logic/ant.h"
@@ -63,14 +66,25 @@ int main() {
 }*/
 
 int main() {
+	srand(time(0));
 	CEthread_init();
 	initializeChannels();
+	clock_gettime(CLOCK_REALTIME, &sign1Begin);
+	clock_gettime(CLOCK_REALTIME, &sign2Begin);
+	clock_gettime(CLOCK_REALTIME, &sign3Begin);
 
-	createAnt(3, 4, 23, 1, 2);
-	createAnt(3, 5, 12, 1, 1);
-	createAnt(3, 5, 5, 1, 0);
+	//CEthread_t antMovementThread;
+	//CEthread_create(&antMovementThread, , NULL);
+	//CEthread_detach(antMovementThread);
+
+	createAnt(0, 0, 1, channel1->lenght, 4, 23, 1, 2);
+	//scheduleAnts();
+	createAnt(0, 0, 1, channel1->lenght, 5, 12, 1, 1);
+	//scheduleAnts();
+	createAnt(0, 0, 1, channel1->lenght, 5, 5, 1, 0);
 	scheduleAnts();
-	
+
+	moveAnts();
 
 	while (1) {
 		//printf("f3\n");

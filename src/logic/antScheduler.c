@@ -5,6 +5,7 @@ void prioritySchedule(queue* list);
 void sjfSchedule(queue* list);
 
 void scheduleAnts() {
+    //CEmutex_lock(&channel1DataMutex);
     if (channel1->scheduler == 1 || channel1->scheduler == 2) {
         if (channel1LeftQueue.count > 1) {
             scheduleChannel(channel1->scheduler, &channel1LeftQueue);
@@ -13,6 +14,9 @@ void scheduleAnts() {
             scheduleChannel(channel1->scheduler, &channel1RightQueue);
         }
     }
+    //CEmutex_unlock(&channel1DataMutex);
+
+    //CEmutex_lock(&channel2DataMutex);
     if (channel2->scheduler == 1 || channel2->scheduler == 2) {
         if (channel2LeftQueue.count > 1) {
             scheduleChannel(channel2->scheduler, &channel2LeftQueue);
@@ -21,6 +25,9 @@ void scheduleAnts() {
             scheduleChannel(channel2->scheduler, &channel2RightQueue);
         }
     }
+    //CEmutex_unlock(&channel2DataMutex);
+
+    //CEmutex_lock(&channel3DataMutex);
     if (channel3->scheduler == 1 || channel3->scheduler == 2) {
         if (channel3LeftQueue.count > 1) {
             scheduleChannel(channel3->scheduler, &channel3LeftQueue);
@@ -29,6 +36,8 @@ void scheduleAnts() {
             scheduleChannel(channel3->scheduler, &channel3RightQueue);
         }
     }
+    //CEmutex_unlock(&channel3DataMutex);
+
     return;
 }
 
