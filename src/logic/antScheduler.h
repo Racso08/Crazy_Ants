@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include "../threads/queue.h"
+#include "../threads/CEthread.h"
 #include "channel.h"
 #include "ant.h"
 
