@@ -5,6 +5,8 @@
 #include "threads/CEthread.h"
 #include "logic/ant.h"
 #include "logic/channel.h"
+#include "logic/antScheduler.h"
+#include "logic/antFlow.h"
 
 /*CEmutex_t mutex;
 
@@ -64,13 +66,13 @@ int main() {
 	CEthread_init();
 	initializeChannels();
 
-	createAnt(1, 4, 23, 1, 2);
-	createAnt(1, 5, 12, 1, 1);
-//	createAnt(1, 5, 5, 1, 0);
+	createAnt(3, 4, 23, 1, 2);
+	createAnt(3, 5, 12, 1, 1);
+	createAnt(3, 5, 5, 1, 0);
+	scheduleAnts();
+	
 
-
-	while (1)
-	{
+	while (1) {
 		//printf("f3\n");
 	}
 

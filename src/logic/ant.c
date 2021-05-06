@@ -1,25 +1,23 @@
 #include "ant.h"
 
-typedef struct {
-    int posX;
-    int posY;
-    int dest;
-    int type;
-    int channel;
-    int time;
-    int priority;
-    CEthread_t* thread;
-} ant_t;
-
 int currentAntAmount = 0;
 
 int checkIfIsPossibleToAddAnt(int channel, int dest);
 void addAntToQueue(ant_t* ant);
 void* startAnt(void* arg);
+void manageFlow(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueue);
+void equity(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueue);
+void equityAux(channel_t* channel, queue* channelQueue);
+void sign(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueue);
+void tico(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueue);
 
 void createAnt(int channel, int priority, int time, int dest, int type) {
     if (checkIfIsPossibleToAddAnt(channel, dest) < 0) {
         printf("Error, no es posible agregar la hormiga en el canal deseado");
+        return;
+    }
+    if (currentAntAmount == MAXANTS) {
+        printf("Error, se ha alcanzada la maxima cantidad de hormigas del programa");
         return;
     }
 
@@ -28,6 +26,7 @@ void createAnt(int channel, int priority, int time, int dest, int type) {
     ant_t* ant = (ant_t*) malloc(sizeof(ant_t));
     ant->posX = 0;
     ant->posY = 0;
+    ant->vel = 0;
     ant->dest = dest;
     ant->type = type;
     ant->channel = channel;

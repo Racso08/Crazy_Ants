@@ -11,6 +11,18 @@
 
 #define MAXANTS 1000
 
+typedef struct {
+    int posX;
+    int posY;
+    int vel;
+    int dest;
+    int type;
+    int channel;
+    int time;
+    int priority;
+    CEthread_t* thread;
+} ant_t;
+
 void createAnt(int channel, int priority, int time, int dest, int type);
 
 #endif

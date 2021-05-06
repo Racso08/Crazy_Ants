@@ -15,6 +15,8 @@ typedef struct {
     int antAmount;
     int time;
     int w;
+    int currentW;
+    int sign;
 } channel_t;
 
 channel_t* channel1;

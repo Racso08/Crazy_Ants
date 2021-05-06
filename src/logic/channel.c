@@ -80,6 +80,8 @@ void initializeChannelsAux(FILE* fp, int id) {
     data = strtok(line, " ");
     data = strtok(NULL, " ");
     channel->w = atoi(data);
+    channel->currentW = 0;
+    channel->sign = 0;
 
     if (id == 1) {
         channel1 = channel;

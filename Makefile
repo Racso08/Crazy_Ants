@@ -1,7 +1,7 @@
 all: main clean
 
-main: main.o CEthread.o queue.o ant.o channel.o
-	gcc -o out/main main.o CEthread.o queue.o ant.o channel.o
+main: main.o CEthread.o queue.o ant.o channel.o antScheduler.o antFlow.o
+	gcc -o out/main main.o CEthread.o queue.o ant.o channel.o antScheduler.o antFlow.o
 
 main.o: src/main.c
 	gcc -c src/main.c
@@ -11,6 +11,12 @@ ant.o: src/logic/ant.c src/logic/ant.h
 
 channel.o: src/logic/channel.c src/logic/channel.h
 	gcc -c src/logic/channel.c
+
+antScheduler.o: src/logic/antScheduler.c src/logic/antScheduler.h
+	gcc -c src/logic/antScheduler.c
+
+antFlow.o: src/logic/antFlow.c src/logic/antFlow.h
+	gcc -c src/logic/antFlow.c
 
 CEthread.o: src/threads/CEthread.c src/threads/CEthread.h
 	gcc -c src/threads/CEthread.c
