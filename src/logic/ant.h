@@ -15,14 +15,17 @@ typedef struct {
     int posX;
     int posY;
     int vel;
+    int currentChannelPosition;
+    int channelLenght;
     int dest;
     int type;
     int channel;
     int time;
     int priority;
+    int inChannel;
     CEthread_t* thread;
 } ant_t;
 
-void createAnt(int channel, int priority, int time, int dest, int type);
+void createAnt(int posX, int posY, int channel, int channelLenght, int priority, int time, int dest, int type);
 
 #endif

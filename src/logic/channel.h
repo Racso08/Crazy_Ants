@@ -6,6 +6,7 @@
 #include <unistd.h>
 #include <string.h>
 #include "../threads/queue.h"
+#include "../threads/CEthread.h"
 
 typedef struct {
     int id;
@@ -18,6 +19,10 @@ typedef struct {
     int currentW;
     int sign;
 } channel_t;
+
+CEmutex_t channel1Mutex, channel1DataMutex;
+CEmutex_t channel2Mutex, channel2DataMutex;
+CEmutex_t channel3Mutex, channel3DataMutex;
 
 channel_t* channel1;
 channel_t* channel2;
