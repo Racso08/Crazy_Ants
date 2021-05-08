@@ -77,11 +77,11 @@ int main() {
 	//CEthread_create(&antMovementThread, , NULL);
 	//CEthread_detach(antMovementThread);
 
-	createAnt(0, 0, 1, channel1->lenght, 4, 23, 1, 2);
+	//createAnt(0, 0, 1, channel1->lenght, 4, 23, 1, 2);
 	//scheduleAnts();
-	createAnt(0, 0, 1, channel1->lenght, 5, 12, 1, 1);
+	//createAnt(0, 0, 1, channel1->lenght, 5, 12, 1, 1);
 	//scheduleAnts();
-	createAnt(0, 0, 1, channel1->lenght, 5, 5, 1, 0);
+	//createAnt(0, 0, 1, channel1->lenght, 5, 5, 1, 0);
 	scheduleAnts();
 
 	moveAnts();

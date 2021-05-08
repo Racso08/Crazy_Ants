@@ -6,7 +6,6 @@ void* startAnt(void* arg);
 
 int currentAntAmount = 0;
 CEthread_t thread[MAXANTS];
-CEmutex_t mutex[MAXANTS];
 
 void createAnt(int posX, int posY, int channelLenght, int dest, int type, int channel, int time, int priority, int finalDest, int path) {
     if (checkIfIsPossibleToAddAnt(channel, dest) < 0) {
@@ -33,8 +32,6 @@ void createAnt(int posX, int posY, int channelLenght, int dest, int type, int ch
     ant->finalDest = finalDest;
     ant->path = path;
     ant->thread = &(thread[currentAntAmount]);
-    ant->mutex = &(mutex[currentAntAmount]);
-    CEmutex_init(ant->mutex);
 
     CEthread_create(&(thread[currentAntAmount]), startAnt, (void*) ant);
     CEthread_detach(thread[currentAntAmount]);
@@ -98,7 +95,6 @@ int checkIfIsPossibleToAddAnt(int channel, int dest) {
 void addAntToQueue(ant_t* ant) {
     switch (ant->channel) {
         case 1:
-            //CEmutex_lock(&channel1DataMutex);
             switch (ant->dest) {
             case 0:
                 queueAddItem(&channel1RightQueue, ant);
@@ -107,10 +103,8 @@ void addAntToQueue(ant_t* ant) {
                 queueAddItem(&channel1LeftQueue, ant);
                 break;
             }
-            //CEmutex_unlock(&channel1DataMutex);
             break;
         case 2:
-            //CEmutex_lock(&channel2DataMutex);
             switch (ant->dest) {
             case 0:
                 queueAddItem(&channel2RightQueue, ant);
@@ -119,10 +113,8 @@ void addAntToQueue(ant_t* ant) {
                 queueAddItem(&channel2LeftQueue, ant);
                 break;
             }
-            //CEmutex_unlock(&channel2DataMutex);
             break;
         case 3:
-            //CEmutex_lock(&channel3DataMutex);
             switch (ant->dest) {
             case 0:
                 queueAddItem(&channel3RightQueue, ant);
@@ -131,7 +123,6 @@ void addAntToQueue(ant_t* ant) {
                 queueAddItem(&channel3LeftQueue, ant);
                 break;
             }
-            //CEmutex_unlock(&channel3DataMutex);
             break;
     }
 
@@ -141,35 +132,31 @@ void addAntToQueue(ant_t* ant) {
 void* startAnt(void* arg) {
     ant_t* ant = (ant_t*) arg;
     
-    CEmutex_lock(ant->mutex);
     int id = *(ant->thread) - 1;
     int channel = ant->channel;
-    int inChannel = ant->inChannel;
 
     printf("Soy la hormiga %d y estoy esperando a cruzar el canal %d\n", id, channel);
     
-    while (inChannel == 0) {
-        CEmutex_unlock(ant->mutex);
+    while (1) {
         CEthread_yield();
-        CEmutex_lock(ant->mutex);
+        if (ant->inChannel == 1) {
+            break;
+        }
     }
 
     printf("Soy la hormiga %d y estoy cruzando el canal %d\n", id, channel);
 
-    while (inChannel = 1) {
-        CEmutex_unlock(ant->mutex);
+    while (1) {
         ant->currentChannelPosition += ant->vel;
         if (ant->currentChannelPosition >= ant->channelLenght) {
             ant->inChannel = 0;
-            inChannel = 0;
+            break;
         }
         CEthread_yield();
-        CEmutex_lock(ant->mutex);
     }
 
     printf("Soy la hormiga %d y ya cruce el canal %d\n", id, channel);
 
-    CEmutex_unlock(ant->mutex);
     free(ant);
     
     return NULL;

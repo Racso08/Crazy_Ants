@@ -26,7 +26,6 @@ typedef struct {
     int finalDest;
     int path;
     CEthread_t* thread;
-    CEmutex_t* mutex;
 } ant_t;
 
 void createAnt(int posX, int posY, int channelLenght, int dest, int type, int channel, int time, int priority, int finalDest, int path);

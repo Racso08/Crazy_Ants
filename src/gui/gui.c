@@ -196,7 +196,7 @@ int main(int argc, char **argv)
                             "File is missing. Please reinstall the program.",
                             NULL);
                     case SDLK_c:
-                        type = atoi(strtok(input,","));
+                        type = atoi(strtok(input,",")); // 0 1 1 -1
                         channel = atoi(strtok(NULL,","));
                         dest = atoi(strtok(NULL,","));   
                         extra = atoi(strtok(NULL,","));  
