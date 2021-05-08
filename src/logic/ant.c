@@ -1,22 +1,22 @@
 #include "ant.h"
 
-int currentAntAmount = 0;
-
 int checkIfIsPossibleToAddAnt(int channel, int dest);
 void addAntToQueue(ant_t* ant);
 void* startAnt(void* arg);
 
-void createAnt(int posX, int posY, int channel, int channelLenght, int priority, int time, int dest, int type) {
+int currentAntAmount = 0;
+CEthread_t thread[MAXANTS];
+CEmutex_t mutex[MAXANTS];
+
+void createAnt(int posX, int posY, int channelLenght, int dest, int type, int channel, int time, int priority, int finalDest, int path) {
     if (checkIfIsPossibleToAddAnt(channel, dest) < 0) {
-        printf("Error, no es posible agregar la hormiga en el canal deseado");
+        printf("Error, no es posible agregar la hormiga en el canal deseado\n");
         return;
     }
     if (currentAntAmount == MAXANTS) {
-        printf("Error, se ha alcanzada la maxima cantidad de hormigas del programa");
+        printf("Error, se ha alcanzada la maxima cantidad de hormigas del programa\n");
         return;
     }
-
-    CEthread_t thread[MAXANTS];
 
     ant_t* ant = (ant_t*) malloc(sizeof(ant_t));
     ant->posX = posX;
@@ -30,7 +30,11 @@ void createAnt(int posX, int posY, int channel, int channelLenght, int priority,
     ant->time = time;
     ant->priority = priority;
     ant->inChannel = 0;
+    ant->finalDest = finalDest;
+    ant->path = path;
     ant->thread = &(thread[currentAntAmount]);
+    ant->mutex = &(mutex[currentAntAmount]);
+    CEmutex_init(ant->mutex);
 
     CEthread_create(&(thread[currentAntAmount]), startAnt, (void*) ant);
     CEthread_detach(thread[currentAntAmount]);
@@ -137,25 +141,35 @@ void addAntToQueue(ant_t* ant) {
 void* startAnt(void* arg) {
     ant_t* ant = (ant_t*) arg;
     
-    printf("Soy la hormiga %d y estoy esperando a cruzar el canal %d\n", *(ant->thread) - 1, ant->channel);
+    CEmutex_lock(ant->mutex);
+    int id = *(ant->thread) - 1;
+    int channel = ant->channel;
+    int inChannel = ant->inChannel;
+
+    printf("Soy la hormiga %d y estoy esperando a cruzar el canal %d\n", id, channel);
     
-    while (ant->inChannel == 0) {
+    while (inChannel == 0) {
+        CEmutex_unlock(ant->mutex);
         CEthread_yield();
+        CEmutex_lock(ant->mutex);
     }
 
-    printf("Soy la hormiga %d y estoy cruzando el canal %d\n", *(ant->thread) - 1, ant->channel);
+    printf("Soy la hormiga %d y estoy cruzando el canal %d\n", id, channel);
 
-    while (ant->inChannel = 1) {
+    while (inChannel = 1) {
+        CEmutex_unlock(ant->mutex);
         ant->currentChannelPosition += ant->vel;
         if (ant->currentChannelPosition >= ant->channelLenght) {
             ant->inChannel = 0;
+            inChannel = 0;
         }
-
         CEthread_yield();
+        CEmutex_lock(ant->mutex);
     }
 
-    printf("Soy la hormiga %d y ya cruce el canal %d\n", *(ant->thread) - 1, ant->channel);
+    printf("Soy la hormiga %d y ya cruce el canal %d\n", id, channel);
 
+    CEmutex_unlock(ant->mutex);
     free(ant);
     
     return NULL;
