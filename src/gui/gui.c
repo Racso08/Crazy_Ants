@@ -42,6 +42,7 @@ void waze(ant_t *ant);
 
 static const int width = 1200;
 static const int height = 700;
+char input[50] = "";
 
 int main(int argc, char **argv)
 {
@@ -82,90 +83,7 @@ int main(int argc, char **argv)
     bool running = true;
     SDL_Event event;
 
-    // ANTS
-    ant_t* ant = (ant_t*) malloc(sizeof(ant_t));
-    ant->posX = 80;
-    ant->posY = 440;
-    ant->vel = 0;
-    ant->dest = 1;
-    ant->finalDest = -1;
-    ant->path = 0;
-    ant->type = 1;
-    ant->channel = 1;
-    ant->time = 10;
-    ant->priority = 2;
-
-    ant_t* ant2 = (ant_t*) malloc(sizeof(ant_t));
-    ant2->posX = 80;
-    ant2->posY = 440;
-    ant2->vel = 0;
-    ant2->dest = 1;
-    ant2->finalDest = -1;
-    ant2->path = 0;
-    ant2->type = 1;
-    ant2->channel = 2;
-    ant2->time = 10;
-    ant2->priority = 2;
-
-    ant_t* ant3 = (ant_t*) malloc(sizeof(ant_t));
-    ant3->posX = 80;
-    ant3->posY = 440;
-    ant3->vel = 0;
-    ant3->dest = 1;
-    ant3->finalDest = -1;
-    ant3->path = 0;
-    ant3->type = 1;
-    ant3->channel = 3;
-    ant3->time = 10;
-    ant3->priority = 2;
-
-    ant_t* ant4 = (ant_t*) malloc(sizeof(ant_t));
-    ant4->posX = 1100;
-    ant4->posY = 440;
-    ant4->vel = 0;
-    ant4->dest = 2;
-    ant4->finalDest = -1;
-    ant4->path = 0;
-    ant4->type = 1;
-    ant4->channel = 1;
-    ant4->time = 10;
-    ant4->priority = 2;
-
-    ant_t* ant5 = (ant_t*) malloc(sizeof(ant_t));
-    ant5->posX = 1100;
-    ant5->posY = 440;
-    ant5->vel = 0;
-    ant5->dest = 2;
-    ant5->finalDest = -1;
-    ant5->path = 0;
-    ant5->type = 1;
-    ant5->channel = 2;
-    ant5->time = 10;
-    ant5->priority = 2;
-
-    ant_t* ant6 = (ant_t*) malloc(sizeof(ant_t));
-    ant6->posX = 1100;
-    ant6->posY = 440;
-    ant6->vel = 0;
-    ant6->dest = 2;
-    ant6->finalDest = -1;
-    ant6->path = 0;
-    ant6->type = 1;
-    ant6->channel = 3;
-    ant6->time = 10;
-    ant6->priority = 2;
-
-    ant_t *antList[6] = {ant,ant2,ant3,ant4,ant5,ant6};
-
-    int canalID = 0;
-    int canal1Counter = 0;
-    int canal2Counter = 0;
-    int canal3Counter = 0;
-    int canal4Counter = 0;
-    int canal5Counter = 0;
-    int canal6Counter = 0;
-    
-    char input[50] = "";
+    // ANT Variables    
     int posX;
     int posY;
     int channelLenght;
@@ -176,37 +94,49 @@ int main(int argc, char **argv)
     int priority;
     int extra;
 
-    SDL_StartTextInput();
+    // Counters for canalization
+    int canal1Counter = 0;
+    int canal2Counter = 0;
+    int canal3Counter = 0;
+    int canal4Counter = 0;
+    int canal5Counter = 0;
+    int canal6Counter = 0;
 
     while(running) {
         // Process events
+         SDL_StartTextInput(); 
+
         while(SDL_PollEvent(&event)) {
             if(event.type == SDL_QUIT) {
                 running = false;
             }
             
+             else if(event.type == SDL_TEXTINPUT) {
+                strcat(input,event.text.text);
+            }
+
             else if(event.type == SDL_KEYDOWN) {
                 switch (event.key.keysym.sym) {
                     case SDLK_w:
                         running = false;
                         break;
+
+                    case SDLK_q:
+
+
                     case SDLK_r:
                         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,
                             "Missing file",
                             "File is missing. Please reinstall the program.",
                             NULL);
+
                     case SDLK_c:
+                        SDL_StopTextInput();
                         type = atoi(strtok(input,",")); // 0 1 1 -1
                         channel = atoi(strtok(NULL,","));
                         dest = atoi(strtok(NULL,","));   
                         extra = atoi(strtok(NULL,","));  
 
-                        /*
-                        printf("%d\n", type);    
-                        printf("%d\n",channel);
-                        printf("%d\n",dest);
-                        printf("%d\n",extra);
-                        */
                         if(dest == 1){
                             posX = 80;
                             posY= 440;
@@ -263,13 +193,10 @@ int main(int argc, char **argv)
                         }
 
                         createAnt(posX, posY, channelLenght, dest, type, channel, channelTime, priority, -1, -1);    
+
+                        strcpy(input,"");
                 }
             }
-
-            else if(event.type == SDL_TEXTINPUT) {
-                strcat(input,event.text.text);
-            }
-            
         }
 
         // Clear screen
@@ -278,7 +205,7 @@ int main(int argc, char **argv)
         // Draw
         SDL_RenderCopy(renderer, backgroundTxt, NULL, &backgroundRect); // BG
 
-
+        //Label
         TTF_Init();
         TTF_Font *verdanaFont = TTF_OpenFont("src/gui/lazy.ttf", 50);
         SDL_Color textColor = { 0, 0, 0, 255 };
@@ -286,58 +213,25 @@ int main(int argc, char **argv)
         SDL_Texture *textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
         int w, h;
         SDL_QueryTexture(textTexture,NULL,NULL,&w,&h);
-        SDL_Rect textRect = {150,150,w,h};
-
-
-        SDL_RenderCopy(renderer, textTexture, NULL, &textRect); // BG
+        SDL_Rect textRect = {470,60,w,h};
+        SDL_RenderCopy(renderer, textTexture, NULL, &textRect); // Label
  
-
         //SPRITES
-        for(int i=0; i<6; i++){
-            SDL_Rect spriteNormal = {(sprite % 5)*24,0,24,38};
-            SDL_Rect normalRect = {antList[i]->posX,antList[i]->posY,24,38}; //SPRITE
-            SDL_RenderCopyEx(renderer,normalTXT,&spriteNormal,&normalRect,0,NULL,0);
+        if(allAnts.count > 0){
+            queueNode *temp = (queueNode*) allAnts.head;
+            ant_t *ant;
 
-            if(antList[i]->finalDest == -1){
-                if(antList[i]->dest == 1){
-                    if(antList[i]->channel == 1){
-                        antList[i]->finalDest = canal1[canal1Counter];
-                        canal1Counter ++;
-                    }
-                    if(antList[i]->channel == 2){
-                        antList[i]->finalDest = canal2[canal2Counter];
-                        canal2Counter ++;
-                    }
-                    if(antList[i]->channel == 3){
-                        antList[i]->finalDest = canal3[canal3Counter];
-                        canal3Counter ++;
-                    }
-                }
+            while(temp != NULL){
+                ant = (ant_t*)temp->item;
 
-                else if(antList[i]->dest == 2){
-                    if(antList[i]->channel == 1){
-                        antList[i]->finalDest = canal4[canal4Counter];
-                        canal4Counter ++;
-                    }
-                    if(antList[i]->channel == 2){
-                        antList[i]->finalDest = canal5[canal5Counter];
-                        canal5Counter ++;
-                    }
-                    if(antList[i]->channel == 3){
-                        antList[i]->finalDest = canal6[canal6Counter];
-                        canal6Counter ++;
-                    }
-                }
-                else{
-                    printf("[ERROR] Ant con destination no available");
-                }
-
-            }
-            else{
-                waze(antList[i]);
+                // ANT
+                SDL_Rect spriteNormal = {(sprite % 5)*24,0,24,38};
+                SDL_Rect normalRect = {ant->posX,ant->posY,24,38}; 
+                SDL_RenderCopyEx(renderer,normalTXT,&spriteNormal,&normalRect,0,NULL,0);
+                temp = temp->next;
             }
 
-        }        
+        }
 
         // Show what was drawn
         SDL_RenderPresent(renderer);
@@ -352,8 +246,6 @@ int main(int argc, char **argv)
 
         SDL_Delay(1000/60);
     }
-
-    SDL_StopTextInput();
 
     // Release resources
     //SDL_DestroyTexture(image_texture);
