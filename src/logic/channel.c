@@ -40,6 +40,7 @@ void initializeChannels() {
     queueInit(&channel2RightQueue);
     queueInit(&channel3LeftQueue);
     queueInit(&channel3RightQueue);
+    queueInit(&allAnts);
 
     CEmutex_init(&channel1Mutex);
     CEmutex_init(&channel2Mutex);

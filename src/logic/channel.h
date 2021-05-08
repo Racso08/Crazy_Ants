@@ -31,6 +31,7 @@ channel_t* channel3;
 queue channel1LeftQueue, channel1RightQueue;
 queue channel2LeftQueue, channel2RightQueue;
 queue channel3LeftQueue, channel3RightQueue;
+queue allAnts;
 
 void initializeChannels();
 

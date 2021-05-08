@@ -37,6 +37,7 @@ void createAnt(int posX, int posY, int channelLenght, int dest, int type, int ch
     CEthread_detach(thread[currentAntAmount]);
 
     addAntToQueue(ant);
+    queueAddItem(&allAnts, ant);
 
     currentAntAmount++;
 
