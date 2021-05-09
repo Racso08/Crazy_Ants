@@ -280,10 +280,9 @@ int waze(ant_t *ant) {
                 ant->posX -= 2;
             }
             else{
-                //ant->path = 3;
-                //printf("stop;");
+                return 1;
             }
-            return 1;
+            return 0;
         }
 
         else if(ant->path == 3){
