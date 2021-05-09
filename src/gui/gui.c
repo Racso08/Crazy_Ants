@@ -29,13 +29,13 @@ typedef struct {
     int priority;
 } ant_t;*/
 
-// GET size of canal to make the positions
-int canal1[6] = {450,422,394,366,338,310};
-int canal2[6] = {450,422,394,366,338,310};
-int canal3[6] = {350,322,294,266,238,210};
-int canal4[6] = {750,778,806,834,862,890};
-int canal5[6] = {720,748,776,804,832,860};
-int canal6[6] = {840,868,896,924,952,980};
+// // GET size of canal to make the positions
+// int izq1[6] = {450,422,394,366,338,310};
+// int izq2[6] = {450,422,394,366,338,310};
+// int izq3[6] = {350,322,294,266,238,210};
+// int der1[6] = {750,778,806,834,862,890};
+// int der2[6] = {720,748,776,804,832,860};
+// int der3[6] = {840,868,896,924,952,980};
 
 SDL_Texture *initialize_texture_from_file(const char* file_name, SDL_Renderer *renderer);
 void waze(ant_t *ant);
@@ -49,6 +49,7 @@ int main(int argc, char **argv)
     srand(time(0));
 	CEthread_init();
 	initializeChannels();
+    initializePositions();
 	clock_gettime(CLOCK_REALTIME, &sign1Begin);
 	clock_gettime(CLOCK_REALTIME, &sign2Begin);
 	clock_gettime(CLOCK_REALTIME, &sign3Begin);
@@ -122,14 +123,14 @@ int main(int argc, char **argv)
                         break;
 
                     case SDLK_q:
-
+                        break;
 
                     case SDLK_r:
                         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,
                             "Missing file",
                             "File is missing. Please reinstall the program.",
                             NULL);
-
+                        break;
                     case SDLK_c:
                         SDL_StopTextInput();
                         type = atoi(strtok(input,",")); // 0 1 1 -1
@@ -186,15 +187,16 @@ int main(int argc, char **argv)
                                 channelTime = -1;
                                 priority = -1;
                             } 
-                        }  
+                        }
                         
                         if (type == 2) {
                             channelTime = extra;
                         }
 
-                        createAnt(posX, posY, channelLenght, dest, type, channel, channelTime, priority, -1, -1);    
+                        createAnt(posX, posY, channelLenght, dest, type, channel, channelTime, priority);
 
                         strcpy(input,"");
+                        break;
                 }
             }
         }
@@ -263,171 +265,3 @@ SDL_Texture *initialize_texture_from_file(const char* file_name, SDL_Renderer *r
     SDL_FreeSurface(image);
     return image_texture;
 }
-
-void waze(ant_t *ant){
-
-    if(ant->dest == 1){
-
-        if(ant->path == 0){
-            if (ant->posX < 200){
-                ant->posX ++;
-            }else{
-                ant->path = 1;
-            }
-        }
-
-        else if(ant->path == 1){
-            if(ant->channel == 1){
-                if(ant->posY != 340){
-                    ant->posY --;
-                }else{
-                    ant->path = 2;
-                }
-            }
-
-            if(ant->channel == 2){
-                ant->path = 2;
-            }
-
-            if(ant->channel == 3){
-                if(ant->posY != 540){
-                    ant->posY ++;
-                }else{
-                    ant->path = 2;
-                }
-            }
-        }
-
-        else if(ant->path == 2){
-            if(ant->posX < ant->finalDest){
-                ant->posX ++;
-            }
-            else if(ant->posX > ant->finalDest){
-                ant->posX --;
-            }
-            else{
-                ant->path = 3;
-                //printf("stop;");
-            }
-        }
-
-        else if(ant->path == 3){
-            if(ant->posX < 1000){
-                ant->posX ++;
-            }
-            else{
-                ant->path = 4;
-            }
-        }
-
-        else if(ant->path == 4){
-            if(ant->posY < 440){
-                ant->posY ++;
-            }
-            else if(ant->posY > 440){
-                ant->posY --;
-            }
-            else{
-                ant->path = 5;
-            }
-        }
-
-        else if(ant->path == 5){
-            if(ant->posX < 1100){
-                ant->posX ++;
-            }
-            else{
-                ant->path = 6;
-            }
-        }
-
-        else{
-            //printf("La hormiga %d finalizo su trayecto\n",ant->vel);
-        } 
-    }
-    else if(ant->dest == 2){
-    
-        if(ant->path == 0){
-            if (ant->posX > 900){
-                ant->posX --;
-            }else{
-                ant->path = 1;
-            }
-        }
-
-        else if(ant->path == 1){
-            if(ant->channel == 1){
-                if(ant->posY != 340){
-                    ant->posY --;
-                }else{
-                    ant->path = 2;
-                }
-            }
-
-            if(ant->channel == 2){
-                ant->path = 2;
-            }
-
-            if(ant->channel == 3){
-                if(ant->posY != 540){
-                    ant->posY ++;
-                }else{
-                    ant->path = 2;
-                }
-            }
-        }
-
-        else if(ant->path == 2){
-            if(ant->posX < ant->finalDest){
-                ant->posX ++;
-            }
-            else if(ant->posX > ant->finalDest){
-                ant->posX --;
-            }
-            else{
-                ant->path = 3;
-                //printf("stop");
-            }
-        }
-
-        else if(ant->path == 3){
-            if(ant->posX > 200){
-                ant->posX --;
-            }
-            else{
-                ant->path = 4;
-            }
-        }
-
-        else if(ant->path == 4){
-            if(ant->posY < 440){
-                ant->posY ++;
-            }
-            else if(ant->posY > 440){
-                ant->posY --;
-            }
-            else{
-                ant->path = 5;
-            }
-        }
-
-        else if(ant->path == 5){
-            if(ant->posX > 100){
-                ant->posX --;
-            }
-            else{
-                ant->path = 6;
-            }
-        }
-
-        else{
-            //printf("La hormiga %d finalizo su trayecto\n",ant->vel);
-        } 
-
-    }
-
-    else{
-        printf("[ERROR] Destination not valid");
-    }
-}
-

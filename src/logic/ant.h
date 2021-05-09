@@ -28,6 +28,9 @@ typedef struct {
     CEthread_t* thread;
 } ant_t;
 
-void createAnt(int posX, int posY, int channelLenght, int dest, int type, int channel, int time, int priority, int finalDest, int path);
+queue izq1, izq2, izq3, der1, der2, der3;
+
+void initializePositions();
+void createAnt(int posX, int posY, int channelLenght, int dest, int type, int channel, int time, int priority);
 
 #endif
