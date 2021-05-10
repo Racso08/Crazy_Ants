@@ -10,5 +10,10 @@
 #include "ant.h"
 
 void scheduleAnts();
+void prioritySchedule(queue* list);
+void sjfSchedule(queue* list);
+void queuePrintPriority(queue* list);
+void queuePrintTime(queue* list);
+
 
 #endif

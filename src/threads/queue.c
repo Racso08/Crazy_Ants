@@ -10,6 +10,7 @@ void queueAddItem(queue* list, queueItem item) {
     queueNode* node = (queueNode*) malloc(sizeof(queueNode));
     node->item = item;
     node->next = NULL;
+    node->prev = NULL;
 
     if (list->head == NULL){
         node->prev = NULL;
@@ -22,7 +23,8 @@ void queueAddItem(queue* list, queueItem item) {
         while (tmp->next != NULL) {
             tmp = tmp->next;
         }
-        node->prev = tmp;
+        //node->prev = tmp;
+        node->prev=tmp;
         tmp->next = node;
         node->item = item;
         list->count++;
