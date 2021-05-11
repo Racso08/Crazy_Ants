@@ -10,7 +10,7 @@
 #include <ucontext.h>
 #include "queue.h"
 
-#define QUANTUM 1
+#define QUANTUM 1000
 #define RUNNING 0
 #define DONE 1
 
@@ -30,10 +30,12 @@ typedef queue CEmutex_t;
 
 int threadsIdCount;
 queue readyQueue, finishQueue;
-cethread_t* currentThread;
+queueNode* currentNode;
 sigset_t vtalrm;
 static struct itimerval timer;
 
+void blockAlarm();
+void unblockAlarm();
 void CEthread_init();
 int CEthread_create(CEthread_t* thread, void *(*start_routine)(void *), void *arg);
 void CEthread_end(void* returnValue);
