@@ -47,7 +47,6 @@ char input[50] = "";
 int main(int argc, char **argv)
 {
     srand(time(0));
-	CEthread_init();
 	initializeChannels();
     initializePositions();
 	clock_gettime(CLOCK_REALTIME, &sign1Begin);
@@ -103,6 +102,8 @@ int main(int argc, char **argv)
     int canal5Counter = 0;
     int canal6Counter = 0;
 
+    CEthread_init();
+
     while(running) {
         // Process events
          SDL_StartTextInput(); 
@@ -133,6 +134,7 @@ int main(int argc, char **argv)
                         break;
                     case SDLK_c:
                         SDL_StopTextInput();
+
                         type = atoi(strtok(input,",")); // 0 1 1 -1
                         channel = atoi(strtok(NULL,","));
                         dest = atoi(strtok(NULL,","));   
@@ -208,7 +210,7 @@ int main(int argc, char **argv)
         SDL_RenderCopy(renderer, backgroundTxt, NULL, &backgroundRect); // BG
 
         //Label
-        TTF_Init();
+       /* TTF_Init();
         TTF_Font *verdanaFont = TTF_OpenFont("src/gui/lazy.ttf", 50);
         SDL_Color textColor = { 0, 0, 0, 255 };
         SDL_Surface *textSurface = TTF_RenderText_Solid(verdanaFont, input, textColor);
@@ -216,7 +218,7 @@ int main(int argc, char **argv)
         int w, h;
         SDL_QueryTexture(textTexture,NULL,NULL,&w,&h);
         SDL_Rect textRect = {470,60,w,h};
-        SDL_RenderCopy(renderer, textTexture, NULL, &textRect); // Label
+        SDL_RenderCopy(renderer, textTexture, NULL, &textRect); // Label*/
  
         //SPRITES
         if(allAnts.count > 0){

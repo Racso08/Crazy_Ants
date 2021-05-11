@@ -7,6 +7,16 @@ void start(void* (*startFunction)(void*), void* args);
 cethread_t* findThread(CEthread_t thread);
 void scheduler(int signal);
 
+void blockAlarm() {
+    sigprocmask(SIG_BLOCK, &vtalrm, NULL);
+    return;
+}
+
+void unblockAlarm() {
+    sigprocmask(SIG_UNBLOCK, &vtalrm, NULL); 
+    return;
+}
+
 void CEthread_init() {
 	struct sigaction act;
 
@@ -29,7 +39,11 @@ void CEthread_init() {
       exit(EXIT_FAILURE);
     }
 
-    currentThread = mainThread;
+    queueNode* mainNode = (queueNode*) malloc(sizeof(queueNode));
+    mainNode->next = NULL;
+    mainNode->prev = NULL;
+    mainNode->item = mainThread;
+    currentNode = mainNode;
     
     sigemptyset(&vtalrm);
     sigaddset(&vtalrm, SIGVTALRM);
@@ -55,7 +69,7 @@ void CEthread_init() {
 
 int CEthread_create(CEthread_t* thread, void *(*startFunction)(void *), void *arg) {
     sigprocmask(SIG_BLOCK, &vtalrm, NULL);
-    
+
     cethread_t* newThread = malloc(sizeof(cethread_t));
     *thread = threadsIdCount;
     newThread->id = threadsIdCount;
@@ -73,7 +87,7 @@ int CEthread_create(CEthread_t* thread, void *(*startFunction)(void *), void *ar
       exit(EXIT_FAILURE);
     }
 
-    newThread->context->uc_stack.ss_sp = malloc(SIGSTKSZ);
+    newThread->context->uc_stack.ss_sp = (char*) malloc(SIGSTKSZ);
     newThread->context->uc_stack.ss_size = SIGSTKSZ;
     newThread->context->uc_stack.ss_flags = 0;
     newThread->context->uc_link = NULL;
@@ -87,6 +101,8 @@ int CEthread_create(CEthread_t* thread, void *(*startFunction)(void *), void *ar
 
 void CEthread_end(void* returnValue) {
     sigprocmask(SIG_BLOCK, &vtalrm, NULL);
+
+    cethread_t* currentThread = (cethread_t*) currentNode->item;
 
     if (readyQueue.count == 0) { 
         sigprocmask(SIG_UNBLOCK, &vtalrm, NULL); 
@@ -105,9 +121,16 @@ void CEthread_end(void* returnValue) {
         exit((long) returnValue);
     }
 
-    cethread_t* previousThread = currentThread; 
-    currentThread = (cethread_t*) queueGetFirstItem(&readyQueue);
-    currentThread->state = RUNNING; 
+    queueNode* previousNode = currentNode;
+    cethread_t* previousThread = (cethread_t*) previousNode->item;
+
+    currentNode = queueGetFirstNode(&readyQueue);
+    currentThread = (cethread_t*) currentNode->item;
+    currentThread->state = RUNNING;
+
+    // cethread_t* previousThread = currentThread; 
+    // currentThread = (cethread_t*) queueGetFirstItem(&readyQueue);
+    // currentThread->state = RUNNING; 
 
     free(previousThread->context->uc_stack.ss_sp); 
     free(previousThread->context);                
@@ -121,7 +144,9 @@ void CEthread_end(void* returnValue) {
         previousThread->returnValue = returnValue;
     }
 
-    queueAddItem(&finishQueue, previousThread);
+    previousNode->next = NULL;
+    previousNode->prev = NULL;
+    queueAddNode(&finishQueue, previousNode);
 
     sigprocmask(SIG_UNBLOCK, &vtalrm, NULL); 
     setcontext(currentThread->context);
@@ -134,18 +159,30 @@ int CEthread_yield(void) {
         return 0;
     }
 
-    cethread_t* nextThread = (cethread_t*) queueGetFirstItem(&readyQueue);
-    cethread_t* previousThread = currentThread;
-    queueAddItem(&readyQueue, currentThread);
-    currentThread = nextThread;
+    queueNode* nextNode = queueGetFirstNode(&readyQueue);
+    cethread_t* nextThread = (cethread_t*) nextNode->item;
+
+    queueNode* previousNode = currentNode;
+    cethread_t* previousThread = (cethread_t*) previousNode->item;
+
+    queueAddNode(&readyQueue, currentNode);
+    currentNode = nextNode;
+
+    // cethread_t* nextThread = (cethread_t*) queueGetFirstItem(&readyQueue);
+    // cethread_t* previousThread = currentThread;
+    // queueAddItem(&readyQueue, currentThread);
+    // currentThread = nextThread;
 
     sigprocmask(SIG_UNBLOCK, &vtalrm, NULL); 
-    swapcontext(previousThread->context, currentThread->context); 
+    swapcontext(previousThread->context, nextThread->context); 
 
     return 0; 
 }
 
 int CEthread_join(CEthread_t thread, void **returnValue) {
+
+    cethread_t* currentThread = (cethread_t*) currentNode->item;
+
     if (thread == currentThread->id) {
         printf("Error, no se puede hacer un join del hilo actual\n");
         return -1;
@@ -221,6 +258,9 @@ int CEmutex_destroy(CEmutex_t* mutex) {
 
 int CEmutex_unlock(CEmutex_t* mutex) {
     sigprocmask(SIG_BLOCK, &vtalrm, NULL);
+
+    cethread_t* currentThread = (cethread_t*) currentNode->item;
+
     if (mutex->count == 0) {
         sigprocmask(SIG_UNBLOCK, &vtalrm, NULL);
         return -1;
@@ -238,6 +278,8 @@ int CEmutex_unlock(CEmutex_t* mutex) {
 
 int CEmutex_lock(CEmutex_t* mutex) {
     sigprocmask(SIG_BLOCK, &vtalrm, NULL); 
+
+    cethread_t* currentThread = (cethread_t*) currentNode->item;
 
     if (mutex->count == 0) {
         queueAddItem(mutex, (void*) (__intptr_t) currentThread->id);  
@@ -262,6 +304,8 @@ int CEmutex_lock(CEmutex_t* mutex) {
 
 void start(void* (*startFunction)(void*), void* args) {
     sigprocmask(SIG_UNBLOCK, &vtalrm, NULL);
+
+    cethread_t* currentThread = (cethread_t*) currentNode->item;
 
     currentThread->returnValue = (*startFunction)(args);
 
@@ -298,13 +342,23 @@ void scheduler(int signal) {
         return;
     }
 
-    cethread_t* nextThread = (cethread_t*) queueGetFirstItem(&readyQueue);
+    queueNode* nextNode = queueGetFirstNode(&readyQueue);
+    cethread_t* nextThread = (cethread_t*) nextNode->item;
 
-    cethread_t* previousThread = currentThread;
-    queueAddItem(&readyQueue, currentThread);
-    nextThread->state = RUNNING; 
-    currentThread = nextThread;
+    queueNode* previousNode = currentNode;
+    cethread_t* previousThread = (cethread_t*) previousNode->item;
+
+    queueAddNode(&readyQueue, currentNode);
+    nextThread->state = RUNNING;
+    currentNode = nextNode;
+
+    // cethread_t* nextThread = (cethread_t*) queueGetFirstItem(&readyQueue);
+
+    // cethread_t* previousThread = currentThread;
+    // queueAddItem(&readyQueue, currentThread);
+    // nextThread->state = RUNNING; 
+    // currentThread = nextThread;
 
     sigprocmask(SIG_UNBLOCK, &vtalrm, NULL); 
-    swapcontext(previousThread->context, currentThread->context);
+    swapcontext(previousThread->context, nextThread->context);
 }

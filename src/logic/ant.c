@@ -100,7 +100,7 @@ int checkIfIsPossibleToAddAnt(int channel, int dest) {
     switch (channel) {
         case 1:
             switch (dest) {
-            case 0:return 0;
+            case 0:
                 if (channel1RightQueue.count < channel1->antAmount) {
                     return queueGetValueInPosition(&der1, channel1RightQueue.count);
                 }
@@ -210,12 +210,12 @@ void* startAnt(void* arg) {
     int channel = ant->channel;
 
     printf("Soy la hormiga %d y estoy esperando a cruzar el canal %d\n", id, channel);
-    
+
     while (1) {
-        CEthread_yield();
         if (ant->inChannel == 1) {
             break;
         }
+        CEthread_yield();
     }
 
     printf("Soy la hormiga %d y estoy cruzando el canal %d\n", id, channel);

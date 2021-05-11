@@ -3,7 +3,6 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-
 typedef void* queueItem;
 
 typedef struct queueNode{
@@ -19,7 +18,9 @@ typedef struct queue{
 
 void queueInit(queue* list);
 void queueAddItem(queue* list, queueItem item);
+void queueAddNode(queue* list, queueNode* node);
 queueItem queueGetFirstItem(queue* list);
+queueNode* queueGetFirstNode(queue* list);
 void queueDestroy(queue* list);
 
 #endif

@@ -65,29 +65,53 @@ int main() {
 	return 0;
 }*/
 
+void* worker(void* arg) {
+	int i = (int) (__intptr_t) arg;
+	
+	while (1) {
+		printf("hola %d\n", i);
+	}
+	
+
+	return NULL;
+}
+
 int main() {
 	srand(time(0));
-	CEthread_init();
 	initializeChannels();
+	initializePositions();
 	clock_gettime(CLOCK_REALTIME, &sign1Begin);
 	clock_gettime(CLOCK_REALTIME, &sign2Begin);
 	clock_gettime(CLOCK_REALTIME, &sign3Begin);
+	CEthread_init();
 
-	//CEthread_t antMovementThread;
-	//CEthread_create(&antMovementThread, , NULL);
-	//CEthread_detach(antMovementThread);
+	//createAnt(posX, posY, channelLenght, dest, type, channel, channelTime, priority);
+	createAnt(80, 440, channel1->lenght, 1, 0, 1, -1, -1);
+	createAnt(80, 440, channel2->lenght, 1, 0, 2, -1, -1);
+	createAnt(80, 440, channel3->lenght, 1, 0, 3, -1, -1);
+	createAnt(80, 440, channel1->lenght, 1, 0, 1, -1, -1);
+	createAnt(80, 440, channel2->lenght, 1, 0, 2, -1, -1);
+	createAnt(80, 440, channel3->lenght, 1, 0, 3, -1, -1);
 
-	//createAnt(0, 0, 1, channel1->lenght, 4, 23, 1, 2);
-	//scheduleAnts();
-	//createAnt(0, 0, 1, channel1->lenght, 5, 12, 1, 1);
-	//scheduleAnts();
-	//createAnt(0, 0, 1, channel1->lenght, 5, 5, 1, 0);
-	scheduleAnts();
+	createAnt(1100, 440, channel1->lenght, 0, 0, 1, -1, -1);
+	createAnt(1100, 440, channel2->lenght, 0, 0, 2, -1, -1);
+	createAnt(1100, 440, channel3->lenght, 0, 0, 3, -1, -1);
+	createAnt(1100, 440, channel1->lenght, 0, 0, 1, -1, -1);
+	createAnt(1100, 440, channel2->lenght, 0, 0, 2, -1, -1);
+	createAnt(1100, 440, channel3->lenght, 0, 0, 3, -1, -1);
 
-	moveAnts();
+	// CEthread_t threads[7];
+
+	// CEthread_create(&threads[0], &worker, (void*) (__intptr_t) 1);
+	// CEthread_create(&threads[1], &worker, (void*) (__intptr_t) 2);
+	// CEthread_create(&threads[2], &worker, (void*) (__intptr_t) 3);
+	// CEthread_create(&threads[3], &worker, (void*) (__intptr_t) 4);
+	// CEthread_create(&threads[4], &worker, (void*) (__intptr_t) 5);
+	// CEthread_create(&threads[5], &worker, (void*) (__intptr_t) 6);
+	// CEthread_create(&threads[6], &worker, (void*) (__intptr_t) 7);
 
 	while (1) {
-		//printf("f3\n");
+		//printf("hola 0\n");
 	}
 
 	return 0;

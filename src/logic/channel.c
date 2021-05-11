@@ -42,13 +42,13 @@ void initializeChannels() {
     queueInit(&channel3RightQueue);
     queueInit(&allAnts);
 
-    CEmutex_init(&channel1Mutex);
-    CEmutex_init(&channel2Mutex);
-    CEmutex_init(&channel3Mutex);
+    // CEmutex_init(&channel1Mutex);
+    // CEmutex_init(&channel2Mutex);
+    // CEmutex_init(&channel3Mutex);
 
-    CEmutex_init(&channel1DataMutex);
-    CEmutex_init(&channel2DataMutex);
-    CEmutex_init(&channel3DataMutex);
+    // CEmutex_init(&channel1DataMutex);
+    // CEmutex_init(&channel2DataMutex);
+    // CEmutex_init(&channel3DataMutex);
 
     return;
 }
