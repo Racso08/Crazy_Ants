@@ -83,6 +83,8 @@ int main(int argc, char **argv)
 
     CEthread_init();
 
+    int inicio = 0;
+
     while(running) {
         // Process events
          SDL_StartTextInput(); 
@@ -102,20 +104,58 @@ int main(int argc, char **argv)
                         running = false;
                         break;
 
-                    case SDLK_q:
+                    case SDLK_j:
+                        channel = 1;
+                        printf("Se selecciono el canal 1\n");
+                        break;
+
+                    case SDLK_k:
+                        channel = 2;
+                        printf("Se selecciono el canal 2\n");
+                        break;
+
+                    case SDLK_l:
+                        channel = 3;
+                        printf("Se selecciono el canal 3\n");
+                        break;
+
+                    case SDLK_z:
+                        type = 0;
+                        printf("Se selecciono una hormiga normal\n");
+                        break;
+                    
+                    case SDLK_x:
+                        type = 1;
+                        printf("Se selecciono una hormiga zompopa\n");
+                        break;
+
+                    case SDLK_c:
+                        type = 2;
+                        printf("Se selecciono una hormiga reina\n");
+                        break;
+
+                    case SDLK_n:
+                        dest = 0;
+                        printf("Se selecciono como destino el hormiguero izquierdo\n");
+                        break;
+
+                    case SDLK_m:
+                        dest = 1;
+                        printf("Se selecciono como destino el hormiguero derecho\n");
+                        break;
+
+                    case SDLK_e:
+                        extra = atoi(input);
+                        printf("Se ingreso el parámetro extra\n");
+                        printf("%s\n",input);
                         break;
 
                     case SDLK_BACKSPACE:
                         input[strlen(input)-1] = '\0';
                         break;
                         
-                    case SDLK_c:
+                    case SDLK_r:
                         SDL_StopTextInput();
-
-                        type = atoi(strtok(input,",")); // 0 1 1 -1
-                        channel = atoi(strtok(NULL,","));
-                        dest = atoi(strtok(NULL,","));   
-                        extra = atoi(strtok(NULL,","));  
 
                         if(dest == 1){
                             posX = 80;
@@ -187,6 +227,7 @@ int main(int argc, char **argv)
         SDL_RenderCopy(renderer, backgroundTxt, NULL, &backgroundRect); // BG
 
         //Label
+        /*
         TTF_Init();
         TTF_Font *verdanaFont = TTF_OpenFont("src/gui/lazy.ttf", 50);
         SDL_Color textColor = { 0, 0, 0, 255 };
@@ -195,8 +236,11 @@ int main(int argc, char **argv)
         int w, h;
         SDL_QueryTexture(textTexture,NULL,NULL,&w,&h);
         SDL_Rect textRect = {470,60,w,h};
-        SDL_RenderCopy(renderer, textTexture, NULL, &textRect); // Label*/
- 
+        SDL_RenderCopy(renderer, textTexture, NULL, &textRect); // Label
+        TTF_Quit();
+        TTF_CloseFont(verdanaFont);
+        */
+
         //SPRITES
         if(allAnts.count > 0){
             queueNode *temp = (queueNode*) allAnts.head;
@@ -253,6 +297,14 @@ int main(int argc, char **argv)
 
         // Show what was drawn
         SDL_RenderPresent(renderer);
+
+        if(inicio == 0){
+            SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,
+            "Missing file",
+            "File is missing. Please reinstall the program.",
+            NULL);
+            inicio = 1;
+        }
 
         // Frametime configuration
         frametime ++;
