@@ -15,28 +15,6 @@
 #include "../logic/antScheduler.h"
 #include "../logic/antFlow.h"
 
-/*
-typedef struct {
-    int posX;
-    int posY;
-    int finalDest;  //add
-    int path;       //add
-    int vel;
-    int dest;
-    int type;
-    int channel;
-    int time;
-    int priority;
-} ant_t;*/
-
-// // GET size of canal to make the positions
-// int izq1[6] = {450,422,394,366,338,310};
-// int izq2[6] = {450,422,394,366,338,310};
-// int izq3[6] = {350,322,294,266,238,210};
-// int der1[6] = {750,778,806,834,862,890};
-// int der2[6] = {720,748,776,804,832,860};
-// int der3[6] = {840,868,896,924,952,980};
-
 SDL_Texture *initialize_texture_from_file(const char* file_name, SDL_Renderer *renderer);
 void waze(ant_t *ant);
 
@@ -52,7 +30,6 @@ int main(int argc, char **argv)
 	clock_gettime(CLOCK_REALTIME, &sign1Begin);
 	clock_gettime(CLOCK_REALTIME, &sign2Begin);
 	clock_gettime(CLOCK_REALTIME, &sign3Begin);
-
     
     // Initialize SDL
     SDL_Init(SDL_INIT_VIDEO);
@@ -69,9 +46,11 @@ int main(int argc, char **argv)
     // Textures
     SDL_Texture * backgroundTxt = initialize_texture_from_file("src/gui/img/background.png", renderer);
     SDL_Texture * normalTXT = initialize_texture_from_file("src/gui/img/normal.png", renderer);
+    SDL_Texture * normalTXTIzq = initialize_texture_from_file("src/gui/img/normal_izq.png", renderer);
     SDL_Texture * zompopaTXT = initialize_texture_from_file("src/gui/img/zompopas.png", renderer);
+    SDL_Texture * zompopaTXTIzq = initialize_texture_from_file("src/gui/img/zompopas_izq.png", renderer);
     SDL_Texture * reinaTXT = initialize_texture_from_file("src/gui/img/reina.png", renderer);
-    SDL_Texture * antTXT = initialize_texture_from_file("src/gui/img/antIsaac.jpeg", renderer);
+    SDL_Texture * reinaTXTIzq = initialize_texture_from_file("src/gui/img/reina_izq.png", renderer);
 
     // Define where on the "screen" we want to draw the texture
     SDL_Rect backgroundRect = {0,0,1200,800};
@@ -210,7 +189,7 @@ int main(int argc, char **argv)
         SDL_RenderCopy(renderer, backgroundTxt, NULL, &backgroundRect); // BG
 
         //Label
-       /* TTF_Init();
+        TTF_Init();
         TTF_Font *verdanaFont = TTF_OpenFont("src/gui/lazy.ttf", 50);
         SDL_Color textColor = { 0, 0, 0, 255 };
         SDL_Surface *textSurface = TTF_RenderText_Solid(verdanaFont, input, textColor);
@@ -228,10 +207,47 @@ int main(int argc, char **argv)
             while(temp != NULL){
                 ant = (ant_t*)temp->item;
 
-                // ANT
-                SDL_Rect spriteNormal = {(sprite % 5)*24,0,24,38};
-                SDL_Rect normalRect = {ant->posX,ant->posY,24,38}; 
-                SDL_RenderCopyEx(renderer,normalTXT,&spriteNormal,&normalRect,0,NULL,0);
+                // ANT 
+
+                if(ant->dest == 1){
+                    if(ant->type == 0){
+                        SDL_Rect spriteNormal = {(sprite % 5)*24,0,24,38};
+                        SDL_Rect normalRect = {ant->posX,ant->posY,24,38}; 
+                        SDL_RenderCopyEx(renderer,normalTXTIzq,&spriteNormal,&normalRect,0,NULL,0);
+                    }
+
+                    if(ant->type == 1){
+                        SDL_Rect spriteNormal = {(sprite % 3)*32,0,32,39};
+                        SDL_Rect normalRect = {ant->posX,ant->posY,32,39}; 
+                        SDL_RenderCopyEx(renderer,zompopaTXTIzq,&spriteNormal,&normalRect,0,NULL,0);
+                    }
+
+                    if(ant->type == 2){
+                        SDL_Rect spriteNormal = {(sprite % 4)*14,0,14,38};
+                        SDL_Rect normalRect = {ant->posX,ant->posY,14,38};
+                        SDL_RenderCopyEx(renderer,reinaTXTIzq,&spriteNormal,&normalRect,0,NULL,0);
+                    }
+                }
+                else{
+                    if(ant->type == 0){
+                        SDL_Rect spriteNormal = {(sprite % 5)*24,0,24,38};
+                        SDL_Rect normalRect = {ant->posX,ant->posY,24,38};
+                        SDL_RenderCopyEx(renderer,normalTXT,&spriteNormal,&normalRect,0,NULL,0);
+                    }
+
+                    if(ant->type == 1){
+                        SDL_Rect spriteNormal = {(sprite % 3)*32,0,32,39};
+                        SDL_Rect normalRect = {ant->posX,ant->posY,32,39}; 
+                        SDL_RenderCopyEx(renderer,zompopaTXT,&spriteNormal,&normalRect,0,NULL,0);
+                    }
+
+                    if(ant->type == 2){
+                        SDL_Rect spriteNormal = {(sprite % 4)*14,0,14,38};
+                        SDL_Rect normalRect = {ant->posX,ant->posY,14,38}; 
+                        SDL_RenderCopyEx(renderer,reinaTXT,&spriteNormal,&normalRect,0,NULL,0);
+                    }
+                }
+                //SDL_RenderCopyEx(renderer,normalTXT,&spriteNormal,&normalRect,0,NULL,0);
                 temp = temp->next;
             }
 

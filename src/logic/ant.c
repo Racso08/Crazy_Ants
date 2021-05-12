@@ -21,8 +21,8 @@ void initializePositions() {
     int antsChannel2 = channel2->antAmount;
     int antsChannel3 = channel3->antAmount;
 
-    int currentIzq = 450;
-    int currentDer = 750;
+    int currentIzq = 520;
+    int currentDer = 770;
     int i;
 
     for (i = 0; i < antsChannel1; i++) {
@@ -33,8 +33,8 @@ void initializePositions() {
         currentDer += 28;
     }
 
-    currentIzq = 450;
-    currentDer = 750;
+    currentIzq = 410;
+    currentDer = 730;
 
     for (i = 0; i < antsChannel2; i++) {
         queueAddItem(&izq2, (void*) (__intptr_t) currentIzq);
@@ -44,8 +44,8 @@ void initializePositions() {
         currentDer += 28;
     }
 
-    currentIzq = 350;
-    currentDer = 750;
+    currentIzq = 370;
+    currentDer = 850;
 
     for (i = 0; i < antsChannel3; i++) {
         queueAddItem(&izq3, (void*) (__intptr_t) currentIzq);
@@ -251,7 +251,7 @@ int waze(ant_t *ant) {
 
         else if(ant->path == 1){
             if(ant->channel == 1){
-                if(ant->posY != 340){
+                if(ant->posY != 300){
                     ant->posY -= 2;
                 }else{
                     ant->path = 2;
@@ -259,11 +259,15 @@ int waze(ant_t *ant) {
             }
 
             if(ant->channel == 2){
-                ant->path = 2;
+                if(ant->posY != 370){
+                    ant->posY -= 2;
+                }else{
+                    ant->path = 2;
+                }
             }
 
             if(ant->channel == 3){
-                if(ant->posY != 540){
+                if(ant->posY != 490){
                     ant->posY += 2;
                 }else{
                     ant->path = 2;
@@ -281,6 +285,7 @@ int waze(ant_t *ant) {
             }
             else{
                 return 1;
+                //ant->path = 3;
             }
             return 0;
         }
@@ -296,10 +301,10 @@ int waze(ant_t *ant) {
         }
 
         else if(ant->path == 4){
-            if(ant->posY < 440){
+            if(ant->posY < 370){
                 ant->posY += 2;
             }
-            else if(ant->posY > 440){
+            else if(ant->posY > 370){
                 ant->posY -= 2;
             }
             else{
@@ -325,7 +330,7 @@ int waze(ant_t *ant) {
     else if(ant->dest == 0){
     
         if(ant->path == 0){
-            if (ant->posX > 900){
+            if (ant->posX > 980){
                 ant->posX -= 2;
             }else{
                 ant->path = 1;
@@ -335,7 +340,7 @@ int waze(ant_t *ant) {
 
         else if(ant->path == 1){
             if(ant->channel == 1){
-                if(ant->posY != 340){
+                if(ant->posY != 320){
                     ant->posY -= 2;
                 }else{
                     ant->path = 2;
@@ -343,11 +348,15 @@ int waze(ant_t *ant) {
             }
 
             if(ant->channel == 2){
-                ant->path = 2;
+                if(ant->posY != 390){
+                    ant->posY -= 2;
+                }else{
+                    ant->path = 2;
+                }
             }
 
             if(ant->channel == 3){
-                if(ant->posY != 540){
+                if(ant->posY != 510){
                     ant->posY += 2;
                 }else{
                     ant->path = 2;
@@ -364,6 +373,7 @@ int waze(ant_t *ant) {
                 ant->posX -= 2;
             }
             else{
+                //ant->path = 3;
                 return 1;
             }
             return 0;
@@ -380,10 +390,10 @@ int waze(ant_t *ant) {
         }
 
         else if(ant->path == 4){
-            if(ant->posY < 440){
+            if(ant->posY < 390){
                 ant->posY += 2;
             }
-            else if(ant->posY > 440){
+            else if(ant->posY > 390){
                 ant->posY -= 2;
             }
             else{
