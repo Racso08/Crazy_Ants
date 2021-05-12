@@ -1,6 +1,6 @@
 #include "antScheduler.h"
 
-int scheduleAntsAux(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueue, int dest);
+void scheduleAntsAux(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueue, int dest);
 int scheduleChannel(int scheduler, queue* list);
 void queuePrintPriority(queue* list);
 void queuePrintTime(queue* list);
@@ -9,41 +9,39 @@ char* queuePriority(queue* list);
 int prioritySchedule(queue* list);
 int sjfSchedule(queue* list);
 
-int scheduleAnts(int channel, int dest) {
+void scheduleAnts(int channel, int dest) {
     switch (channel) {
         case 1:
-            return scheduleAntsAux(channel1, &channel1LeftQueue, &channel1RightQueue, dest);
+            scheduleAntsAux(channel1, &channel1LeftQueue, &channel1RightQueue, dest);
             break;
         
         case 2:
-            return scheduleAntsAux(channel2, &channel2LeftQueue, &channel2RightQueue, dest);
+            scheduleAntsAux(channel2, &channel2LeftQueue, &channel2RightQueue, dest);
             break;
 
         case 3:
-            return scheduleAntsAux(channel3, &channel3LeftQueue, &channel3RightQueue, dest);
+            scheduleAntsAux(channel3, &channel3LeftQueue, &channel3RightQueue, dest);
             break;
     }
 
-    return 1;
+    return;
 }
 
-int scheduleAntsAux(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueue, int dest) {
+void scheduleAntsAux(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueue, int dest) {
     switch (dest) {
         case 0:
             if (channelRightQueue->count > 1) {
                 channel->scheduled = scheduleChannel(channel->scheduler, channelRightQueue);
-                return channel->scheduled;
             }
             break;
         case 1:
             if (channelLeftQueue->count > 1) {
                 channel->scheduled = scheduleChannel(channel->scheduler, channelLeftQueue);
-                return channel->scheduled;
             }
             break;
     }
 
-    return 1;
+    return;
 }
 
 int scheduleChannel(int scheduler, queue* list) {

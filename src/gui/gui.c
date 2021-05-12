@@ -68,7 +68,6 @@ int main(int argc, char **argv)
     int extra = -1;
     int inicio = 0;
     int antCreated = 0;
-    int changeInQueue = 1;
 
     // Counters for canalization
     int canal1Counter = 0;
@@ -164,7 +163,7 @@ int main(int argc, char **argv)
                             antCreated = createAnt(type, channel, dest, extra);
 
                             if (antCreated == 1) {
-                                changeInQueue = scheduleAnts(channel, dest);
+                                scheduleAnts(channel, dest);
                             }
 
                             strcpy(input,"");
