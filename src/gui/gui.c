@@ -139,6 +139,7 @@ int main(int argc, char **argv)
                         break;
 
                     case SDLK_e:
+                        SDL_StopTextInput();    
                         extra = atoi(input);
                         printf("Se ingreso el parámetro extra\n");
                         printf("%s\n", input);
@@ -146,6 +147,13 @@ int main(int argc, char **argv)
 
                     case SDLK_BACKSPACE:
                         strcpy(input,"");
+                        break;
+
+                    case SDLK_i:
+                        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION,
+                        "Comandos",
+                        "z: hormiga normal\nx: hormiga zompopa\nc: hormiga reina\nn: hormiguero izquierdo\nm: hormiguero derecho\nj: canal 1\nk: canal 2\nl: canal 3",
+                        NULL);
                         break;
                         
                     case SDLK_r:
