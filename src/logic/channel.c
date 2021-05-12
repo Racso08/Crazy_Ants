@@ -42,14 +42,6 @@ void initializeChannels() {
     queueInit(&channel3RightQueue);
     queueInit(&allAnts);
 
-    // CEmutex_init(&channel1Mutex);
-    // CEmutex_init(&channel2Mutex);
-    // CEmutex_init(&channel3Mutex);
-
-    // CEmutex_init(&channel1DataMutex);
-    // CEmutex_init(&channel2DataMutex);
-    // CEmutex_init(&channel3DataMutex);
-
     return;
 }
 
@@ -89,16 +81,21 @@ void initializeChannelsAux(FILE* fp, int id) {
     data = strtok(line, " ");
     data = strtok(NULL, " ");
     channel->w = atoi(data);
+
     channel->currentW = 0;
     channel->sign = 0;
+    channel->scheduled = 0;
 
     if (id == 1) {
+        channel->trueLenght = 250;
         channel1 = channel;
     }
     else if (id == 2) {
+        channel->trueLenght = 320;
         channel2 = channel;
     }
     else if (id == 3) {
+        channel->trueLenght = 450;
         channel3 = channel;
     }
 

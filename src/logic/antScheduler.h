@@ -9,7 +9,7 @@
 #include "channel.h"
 #include "ant.h"
 
-void scheduleAnts();
+void scheduleAnts(int channel, int dest);
 void prioritySchedule(queue* list);
 void sjfSchedule(queue* list);
 void queuePrintPriority(queue* list);

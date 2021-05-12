@@ -1,7 +1,7 @@
 all: gui clean
 
 gui: gui.o CEthread.o queue.o ant.o channel.o antScheduler.o antFlow.o
-	gcc -o out/gui gui.o CEthread.o queue.o ant.o channel.o antScheduler.o antFlow.o `sdl2-config --libs --cflags` -lSDL2_image -lSDL2_ttf
+	gcc -o out/gui gui.o CEthread.o queue.o ant.o channel.o antScheduler.o antFlow.o `sdl2-config --libs --cflags` -lSDL2_image
 
 gui.o: src/gui/gui.c
 	gcc -c src/gui/gui.c

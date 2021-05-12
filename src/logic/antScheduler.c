@@ -1,5 +1,6 @@
 #include "antScheduler.h"
 
+void scheduleAntsAux(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueue, int dest);
 void scheduleChannel(int scheduler, queue* list);
 //oid prioritySchedule(queue* list);
 //void sjfSchedule(queue* list);
@@ -28,39 +29,37 @@ void queuePrintTime(queue* list){
     }
 }
 
-void scheduleAnts() {
-    //CEmutex_lock(&channel1DataMutex);
-    if (channel1->scheduler == 1 || channel1->scheduler == 2) {
-        if (channel1LeftQueue.count > 1) {
-            scheduleChannel(channel1->scheduler, &channel1LeftQueue);
-        }
-        if (channel1RightQueue.count > 1) {
-            scheduleChannel(channel1->scheduler, &channel1RightQueue);
-        }
-    }
-    //CEmutex_unlock(&channel1DataMutex);
+void scheduleAnts(int channel, int dest) {
+    switch (channel) {
+        case 1:
+            scheduleAntsAux(channel1, &channel1LeftQueue, &channel1RightQueue, dest);
+            break;
+        
+        case 2:
+            scheduleAntsAux(channel2, &channel2LeftQueue, &channel2RightQueue, dest);
+            break;
 
-    //CEmutex_lock(&channel2DataMutex);
-    if (channel2->scheduler == 1 || channel2->scheduler == 2) {
-        if (channel2LeftQueue.count > 1) {
-            scheduleChannel(channel2->scheduler, &channel2LeftQueue);
-        }
-        if (channel2RightQueue.count > 1) {
-            scheduleChannel(channel2->scheduler, &channel2RightQueue);
-        }
+        case 3:
+            scheduleAntsAux(channel3, &channel3LeftQueue, &channel3RightQueue, dest);
+            break;
     }
-    //CEmutex_unlock(&channel2DataMutex);
 
-    //CEmutex_lock(&channel3DataMutex);
-    if (channel3->scheduler == 1 || channel3->scheduler == 2) {
-        if (channel3LeftQueue.count > 1) {
-            scheduleChannel(channel3->scheduler, &channel3LeftQueue);
-        }
-        if (channel3RightQueue.count > 1) {
-            scheduleChannel(channel3->scheduler, &channel3RightQueue);
-        }
+    return;
+}
+
+void scheduleAntsAux(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueue, int dest) {
+    switch (dest) {
+        case 0:
+            if (channelRightQueue->count > 1) {
+                scheduleChannel(channel->scheduler, channelRightQueue);
+            }
+            break;
+        case 1:
+            if (channelLeftQueue->count > 1) {
+                scheduleChannel(channel->scheduler, channelLeftQueue);
+            }
+            break;
     }
-    //CEmutex_unlock(&channel3DataMutex);
 
     return;
 }
@@ -74,6 +73,7 @@ void scheduleChannel(int scheduler, queue* list) {
             sjfSchedule(list);
             break;
     }
+
     return;
 }
 

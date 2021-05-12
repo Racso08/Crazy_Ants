@@ -7,16 +7,6 @@ void start(void* (*startFunction)(void*), void* args);
 cethread_t* findThread(CEthread_t thread);
 void scheduler(int signal);
 
-void blockAlarm() {
-    sigprocmask(SIG_BLOCK, &vtalrm, NULL);
-    return;
-}
-
-void unblockAlarm() {
-    sigprocmask(SIG_UNBLOCK, &vtalrm, NULL); 
-    return;
-}
-
 void CEthread_init() {
 	struct sigaction act;
 

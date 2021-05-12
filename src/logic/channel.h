@@ -13,11 +13,13 @@ typedef struct {
     int scheduler;
     int flow;
     int lenght;
+    int trueLenght;
     int antAmount;
     int time;
     int w;
     int currentW;
     int sign;
+    int scheduled;
 } channel_t;
 
 CEmutex_t channel1Mutex, channel1DataMutex;

@@ -1,8 +1,11 @@
 #include "antFlow.h"
 
 void manageFlow(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueue, ant_t* currentChannelAnt, long elapsedSignTime, struct timespec signBegin, struct timespec signEnd);
+
 void equity(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueue, ant_t* currentChannelAnt);
 void equityAux(channel_t* channel, queue* channelQueue, ant_t* currentChannelAnt);
+void equityFCFS(channel_t* channel, queue* channelQueue, ant_t* currentChannelAnt);
+
 void sign(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueue, ant_t* currentChannelAnt, long elapsedSignTime, struct timespec signBegin, struct timespec signEnd);
 void tico(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueue, ant_t* currentChannelAnt);
 void signAndticoAux(channel_t* channel, queue* channelQueue, ant_t* currentChannelAnt);
@@ -15,22 +18,6 @@ long elapsedSign2Time = 0;
 long elapsedSign3Time = 0;
 
 void moveAnts() {
-    /*while (1) {
-        CEmutex_lock(&channel1DataMutex);
-        manageFlow(channel1, &channel1LeftQueue, &channel1RightQueue, currentChannel1Ant);
-        CEmutex_unlock(&channel1DataMutex);
-
-        CEmutex_lock(&channel2DataMutex);
-        manageFlow(channel2, &channel2LeftQueue, &channel2RightQueue, currentChannel2Ant);
-        CEmutex_unlock(&channel2DataMutex);
-
-        CEmutex_lock(&channel3DataMutex);
-        manageFlow(channel3, &channel3LeftQueue, &channel3RightQueue, currentChannel3Ant);
-        CEmutex_unlock(&channel3DataMutex);
-
-        CEthread_yield();
-    }*/
-
     manageFlow(channel1, &channel1LeftQueue, &channel1RightQueue, currentChannel1Ant, elapsedSign1Time, sign1Begin, sign1End);
     manageFlow(channel2, &channel2LeftQueue, &channel2RightQueue, currentChannel2Ant, elapsedSign2Time, sign2Begin, sign2End);
     manageFlow(channel3, &channel3LeftQueue, &channel3RightQueue, currentChannel3Ant, elapsedSign3Time, sign3Begin, sign3End);
@@ -83,6 +70,28 @@ void equity(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueu
 }
 
 void equityAux(channel_t* channel, queue* channelQueue, ant_t* currentChannelAnt) {
+    switch (channel->scheduler) {
+        case 0:
+            //rr
+            break;
+        case 1:
+            // prio
+            break;
+        case 2:
+            // sjf
+            break;
+        case 3:
+            equityFCFS(channel, channelQueue, currentChannelAnt);
+            break;
+        case 4:
+            // tr
+            break;
+    }
+
+    return;
+}
+
+void equityFCFS(channel_t* channel, queue* channelQueue, ant_t* currentChannelAnt) {
     if (currentChannelAnt != NULL) {
         if (currentChannelAnt->inChannel == 1) {
             return;

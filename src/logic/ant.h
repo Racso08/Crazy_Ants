@@ -31,6 +31,6 @@ typedef struct {
 queue izq1, izq2, izq3, der1, der2, der3;
 
 void initializePositions();
-void createAnt(int posX, int posY, int channelLenght, int dest, int type, int channel, int time, int priority);
+int createAnt(int type, int channel, int dest, int extra);
 
 #endif

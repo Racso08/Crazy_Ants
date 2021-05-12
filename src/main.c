@@ -86,7 +86,7 @@ int main() {
 	CEthread_init();
 
 	//createAnt(posX, posY, channelLenght, dest, type, channel, channelTime, priority);
-	createAnt(80, 440, channel1->lenght, 1, 0, 1, -1, -1);
+	/*createAnt(80, 440, channel1->lenght, 1, 0, 1, -1, -1);
 	createAnt(80, 440, channel2->lenght, 1, 0, 2, -1, -1);
 	createAnt(80, 440, channel3->lenght, 1, 0, 3, -1, -1);
 	createAnt(80, 440, channel1->lenght, 1, 0, 1, -1, -1);
@@ -98,7 +98,7 @@ int main() {
 	createAnt(1100, 440, channel3->lenght, 0, 0, 3, -1, -1);
 	createAnt(1100, 440, channel1->lenght, 0, 0, 1, -1, -1);
 	createAnt(1100, 440, channel2->lenght, 0, 0, 2, -1, -1);
-	createAnt(1100, 440, channel3->lenght, 0, 0, 3, -1, -1);
+	createAnt(1100, 440, channel3->lenght, 0, 0, 3, -1, -1);*/
 
 	// CEthread_t threads[7];
 

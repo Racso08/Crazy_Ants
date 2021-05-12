@@ -8,7 +8,6 @@
 #include <stdbool.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
-#include <SDL2/SDL_ttf.h>
 
 #include "../logic/ant.h"
 #include "../logic/channel.h"
@@ -63,15 +62,12 @@ int main(int argc, char **argv)
     SDL_Event event;
 
     // ANT Variables    
-    int posX;
-    int posY;
-    int channelLenght;
-    int dest;
-    int type;
-    int channel;
-    int channelTime;
-    int priority;
-    int extra;
+    int type = -1;
+    int channel = -1;
+    int dest = -1;
+    int extra = -1;
+    int inicio = 0;
+    int antCreated = 0;
 
     // Counters for canalization
     int canal1Counter = 0;
@@ -82,8 +78,6 @@ int main(int argc, char **argv)
     int canal6Counter = 0;
 
     CEthread_init();
-
-    int inicio = 0;
 
     while(running) {
         // Process events
@@ -147,74 +141,29 @@ int main(int argc, char **argv)
                     case SDLK_e:
                         extra = atoi(input);
                         printf("Se ingreso el parámetro extra\n");
-                        printf("%s\n",input);
+                        printf("%s\n", input);
                         break;
 
                     case SDLK_BACKSPACE:
-                        input[strlen(input)-1] = '\0';
+                        strcpy(input,"");
                         break;
                         
                     case SDLK_r:
-                        SDL_StopTextInput();
+                        if (type != -1 && channel != -1 && dest != -1) {
+                            SDL_StopTextInput();
 
-                        if(dest == 1){
-                            posX = 80;
-                            posY= 440;
-                        }else if (dest == 0){
-                            posX = 1100;
-                            posY = 440;
-                        }
+                            antCreated = createAnt(type, channel, dest, extra);
 
-                        if(channel == 1){
-                            channelLenght = channel1->lenght;   
-                            
-                            if(channel1->scheduler == 1){
-                                priority = extra;
-                                channelTime = -1;
-                            }else if(channel1->scheduler == 2 || channel1->scheduler == 4){
-                                channelTime = extra;
-                                priority = -1;
-                            }else {
-                                channelTime = -1;
-                                priority = -1;
+                            if (antCreated == 1) {
+                                scheduleAnts(channel, dest);
                             }
 
-                        }else if(channel == 2){
-                            channelLenght = channel2->lenght; 
-
-                            if(channel2->scheduler == 1){
-                                priority = extra;
-                                channelTime = -1;
-                            }else if(channel2->scheduler == 2 || channel2->scheduler == 4){
-                                channelTime = extra;
-                                priority = -1;
-                            }else {
-                                channelTime = -1;
-                                priority = -1;
-                            }
-
-                        }else if(channel == 3){
-                            channelLenght = channel3->lenght; 
-
-                            if(channel3->scheduler == 1){
-                                priority = extra;
-                                channelTime = -1;
-                            }else if(channel3->scheduler == 2 || channel3->scheduler == 4){
-                                channelTime = extra;
-                                priority = -1;
-                            }else {
-                                channelTime = -1;
-                                priority = -1;
-                            } 
+                            strcpy(input,"");
                         }
-                        
-                        if (type == 2) {
-                            channelTime = extra;
+                        else {
+                            printf("Por favor ingrese los parametros de la hormiga");
                         }
 
-                        createAnt(posX, posY, channelLenght, dest, type, channel, channelTime, priority);
-
-                        strcpy(input,"");
                         break;
                 }
             }
@@ -240,6 +189,8 @@ int main(int argc, char **argv)
         TTF_Quit();
         TTF_CloseFont(verdanaFont);
         */
+
+        moveAnts();
 
         //SPRITES
         if(allAnts.count > 0){
@@ -300,8 +251,8 @@ int main(int argc, char **argv)
 
         if(inicio == 0){
             SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,
-            "Missing file",
-            "File is missing. Please reinstall the program.",
+            "Instrucciones para crear una hormiga",
+            "Tipo de Hormiga: Z - Normal, X - Zompopa, C - Reina\n Canal de la Hormiga: J - Canal 1, K - Canal 2, L - Canal 3\n Hormiguero Destino: N - Hormiguero Izquierdo, M - Hormiguero Derecho\n Parametro Extra: Digitelo y Presione E",
             NULL);
             inicio = 1;
         }

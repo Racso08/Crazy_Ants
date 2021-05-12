@@ -34,8 +34,6 @@ queueNode* currentNode;
 sigset_t vtalrm;
 static struct itimerval timer;
 
-void blockAlarm();
-void unblockAlarm();
 void CEthread_init();
 int CEthread_create(CEthread_t* thread, void *(*start_routine)(void *), void *arg);
 void CEthread_end(void* returnValue);
