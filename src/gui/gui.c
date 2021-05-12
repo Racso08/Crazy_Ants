@@ -105,6 +105,10 @@ int main(int argc, char **argv)
                     case SDLK_q:
                         break;
 
+                    case SDLK_BACKSPACE:
+                        input[strlen(input)-1] = '\0';
+                        break;
+
                     case SDLK_r:
                         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,
                             "Missing file",
@@ -247,7 +251,7 @@ int main(int argc, char **argv)
                         SDL_RenderCopyEx(renderer,reinaTXT,&spriteNormal,&normalRect,0,NULL,0);
                     }
                 }
-                //SDL_RenderCopyEx(renderer,normalTXT,&spriteNormal,&normalRect,0,NULL,0);
+                
                 temp = temp->next;
             }
 
@@ -268,7 +272,13 @@ int main(int argc, char **argv)
     }
 
     // Release resources
-    //SDL_DestroyTexture(image_texture);
+    SDL_DestroyTexture(backgroundTxt);
+    SDL_DestroyTexture(normalTXT);
+    SDL_DestroyTexture(normalTXTIzq);
+    SDL_DestroyTexture(zompopaTXT);
+    SDL_DestroyTexture(zompopaTXTIzq);
+    SDL_DestroyTexture(reinaTXT);
+    SDL_DestroyTexture(reinaTXTIzq);
     IMG_Quit();
     SDL_DestroyRenderer(renderer);
     SDL_DestroyWindow(window);
