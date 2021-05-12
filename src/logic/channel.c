@@ -84,7 +84,7 @@ void initializeChannelsAux(FILE* fp, int id) {
 
     channel->currentW = 0;
     channel->sign = 0;
-    channel->scheduled = 0;
+    channel->scheduled = 1;
 
     if (id == 1) {
         channel->trueLenght = 250;

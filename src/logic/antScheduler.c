@@ -1,83 +1,100 @@
 #include "antScheduler.h"
 
-void scheduleAntsAux(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueue, int dest);
-void scheduleChannel(int scheduler, queue* list);
-//oid prioritySchedule(queue* list);
-//void sjfSchedule(queue* list);
+int scheduleAntsAux(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueue, int dest);
+int scheduleChannel(int scheduler, queue* list);
+void queuePrintPriority(queue* list);
+void queuePrintTime(queue* list);
+char* queueTimes(queue* list);
+char* queuePriority(queue* list);
+int prioritySchedule(queue* list);
+int sjfSchedule(queue* list);
 
-
-void queuePrintPriority(queue* list){
-    queueNode *tmp = list->head;
-    ant_t* ant;
-    while (tmp!=NULL)
-    {
-        ant=(ant_t*) tmp->item;
-        printf("prioridad: %d\n",ant->priority);
-        //printf("tiempo: %d\n",ant->time);
-        tmp = tmp->next;
-    }
-}
-
-void queuePrintTime(queue* list){
-    queueNode *tmp = list->head;
-    ant_t* ant;
-    while (tmp!=NULL)
-    {
-        ant=(ant_t*) tmp->item;
-        printf("tiempo: %d\n",ant->time);
-        tmp = tmp->next;
-    }
-}
-
-void scheduleAnts(int channel, int dest) {
+int scheduleAnts(int channel, int dest) {
     switch (channel) {
         case 1:
-            scheduleAntsAux(channel1, &channel1LeftQueue, &channel1RightQueue, dest);
+            return scheduleAntsAux(channel1, &channel1LeftQueue, &channel1RightQueue, dest);
             break;
         
         case 2:
-            scheduleAntsAux(channel2, &channel2LeftQueue, &channel2RightQueue, dest);
+            return scheduleAntsAux(channel2, &channel2LeftQueue, &channel2RightQueue, dest);
             break;
 
         case 3:
-            scheduleAntsAux(channel3, &channel3LeftQueue, &channel3RightQueue, dest);
+            return scheduleAntsAux(channel3, &channel3LeftQueue, &channel3RightQueue, dest);
             break;
     }
 
-    return;
+    return 1;
 }
 
-void scheduleAntsAux(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueue, int dest) {
+int scheduleAntsAux(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueue, int dest) {
     switch (dest) {
         case 0:
             if (channelRightQueue->count > 1) {
-                scheduleChannel(channel->scheduler, channelRightQueue);
+                channel->scheduled = scheduleChannel(channel->scheduler, channelRightQueue);
+                return channel->scheduled;
             }
             break;
         case 1:
             if (channelLeftQueue->count > 1) {
-                scheduleChannel(channel->scheduler, channelLeftQueue);
+                channel->scheduled = scheduleChannel(channel->scheduler, channelLeftQueue);
+                return channel->scheduled;
             }
             break;
     }
 
-    return;
+    return 1;
 }
 
-void scheduleChannel(int scheduler, queue* list) {
+int scheduleChannel(int scheduler, queue* list) {
     switch (scheduler) {
         case 1:
-            prioritySchedule(list);
+            return prioritySchedule(list);
             break;
         case 2:
-            sjfSchedule(list);
+            return sjfSchedule(list);
             break;
     }
 
-    return;
+    return 1;
 }
 
-void prioritySchedule(queue* list) {
+char* queueTimes(queue* list) {
+    char *times=malloc(sizeof(char)*20);
+    char time[50];
+    queueNode *tmp = list->head;
+    ant_t* ant;
+    while (tmp!=NULL)
+    {
+        ant=(ant_t*) tmp->item;
+        sprintf( time, "%d", ant->time );
+        strcat(times, time);
+        tmp = tmp->next;
+    }
+    printf("tiempos1: %s\n: ",times);
+    return times;
+}
+
+char* queuePriority(queue* list) {
+    char *priorities=malloc(sizeof(char)*20);
+    char priority[50];
+    queueNode *tmp = list->head;
+    ant_t* ant;
+    while (tmp!=NULL)
+    {
+        ant=(ant_t*) tmp->item;
+        sprintf( priority, "%d", ant->priority );
+        strcat(priorities, priority);
+        tmp = tmp->next;
+    }
+    printf("tiempos1: %s\n: ",priorities);
+    return priorities;
+}
+
+int prioritySchedule(queue* list) {
+    int changes=0;
+    char priority_init[50]="";
+	strcat(priority_init,queuePriority(list));
     queueNode* tmp=list->head;
     queueNode* tmp_next;
     queueNode* tmp_prev;
@@ -87,7 +104,7 @@ void prioritySchedule(queue* list) {
     int swapped;
   
     if (tmp == NULL)
-        return;
+        return 1;
     do{    
         swapped = 0;
         tmp=list->head;
@@ -127,10 +144,19 @@ void prioritySchedule(queue* list) {
         }
 
     } 
-    while(swapped);   
+    while(swapped);
+    char priority_final[50]="";
+	strcat(priority_final,queuePriority(list)); 
+    if(strcmp(priority_init,priority_final)==0){
+        changes=1;
+    }
+    return changes;  
 }
 
-void sjfSchedule(queue* list) {
+int sjfSchedule(queue* list) {
+    int changes=0;
+    char times_init[50]="";
+	strcat(times_init,queueTimes(list));
     queueNode* tmp=list->head;
     queueNode* tmp_next;
     queueNode* tmp_prev;
@@ -140,7 +166,7 @@ void sjfSchedule(queue* list) {
     int swapped;
   
     if (tmp == NULL)
-        return;
+        return 1;
     do{     
         swapped = 0;
         tmp=list->head;
@@ -180,5 +206,33 @@ void sjfSchedule(queue* list) {
         }
 
     } 
-    while(swapped);   
+    while(swapped);
+    char times_final[50]="";
+	strcat(times_final,queueTimes(list)); 
+    if(strcmp(times_init,times_final)==0){
+        changes=1;
+    }
+    return changes;    
+}
+
+void queuePrintPriority(queue* list){
+    queueNode *tmp = list->head;
+    ant_t* ant;
+    while (tmp!=NULL)
+    {
+        ant=(ant_t*) tmp->item;
+        printf("prioridad: %d\n",ant->priority);
+        tmp = tmp->next;
+    }
+}
+
+void queuePrintTime(queue* list){
+    queueNode *tmp = list->head;
+    ant_t* ant;
+    while (tmp!=NULL)
+    {
+        ant=(ant_t*) tmp->item;
+        printf("tiempo: %d\n",ant->time);
+        tmp = tmp->next;
+    }
 }
