@@ -108,13 +108,7 @@ int main(int argc, char **argv)
                     case SDLK_BACKSPACE:
                         input[strlen(input)-1] = '\0';
                         break;
-
-                    case SDLK_r:
-                        SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR,
-                            "Missing file",
-                            "File is missing. Please reinstall the program.",
-                            NULL);
-                        break;
+                        
                     case SDLK_c:
                         SDL_StopTextInput();
 
