@@ -367,7 +367,7 @@ int waze(ant_t *ant) {
 
         else if(ant->path == 1){
             if(ant->channel == 1){
-                if(ant->posY != 300){
+                if(ant->posY > 300){
                     ant->posY -= ant->vel;
                 }else{
                     ant->path = 2;
@@ -375,7 +375,7 @@ int waze(ant_t *ant) {
             }
 
             if(ant->channel == 2){
-                if(ant->posY != 370){
+                if(ant->posY > 370){
                     ant->posY -= ant->vel;
                 }else{
                     ant->path = 2;
@@ -383,7 +383,7 @@ int waze(ant_t *ant) {
             }
 
             if(ant->channel == 3){
-                if(ant->posY != 490){
+                if(ant->posY < 490){
                     ant->posY += ant->vel;
                 }else{
                     ant->path = 2;
@@ -417,20 +417,28 @@ int waze(ant_t *ant) {
         }
 
         else if(ant->path == 4){
-            if(ant->posY < 370){
-                ant->posY += ant->vel;
+
+            if(ant->channel==1 && ant->posY < 370){
+                ant->posY += ant->vel;  
             }
-            else if(ant->posY > 370){
+            
+            else if(ant->channel == 2 && ant->posY > 370){
                 ant->posY -= ant->vel;
             }
+
+            else if(ant->channel == 3 && ant->posY > 370){
+                ant->posY -= ant->vel;
+            }
+
             else{
                 ant->path = 5;
             }
+
             return 0;
         }
 
         else if(ant->path == 5){
-            if(ant->posX < 1100){
+            if(ant->posX < 1200){
                 ant->posX += ant->vel;
             }
             else{
@@ -456,7 +464,7 @@ int waze(ant_t *ant) {
 
         else if(ant->path == 1){
             if(ant->channel == 1){
-                if(ant->posY != 320){
+                if(ant->posY > 320){
                     ant->posY -= ant->vel;
                 }else{
                     ant->path = 2;
@@ -464,7 +472,7 @@ int waze(ant_t *ant) {
             }
 
             if(ant->channel == 2){
-                if(ant->posY != 390){
+                if(ant->posY > 390){
                     ant->posY -= ant->vel;
                 }else{
                     ant->path = 2;
@@ -472,7 +480,7 @@ int waze(ant_t *ant) {
             }
 
             if(ant->channel == 3){
-                if(ant->posY != 510){
+                if(ant->posY < 510){
                     ant->posY += ant->vel;
                 }else{
                     ant->path = 2;
