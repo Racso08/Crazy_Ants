@@ -272,7 +272,7 @@ int main(int argc, char **argv)
             sprite++;
         }
 
-        SDL_Delay(1000/60);
+        SDL_Delay(1000/120);
     }
 
     // Release resources

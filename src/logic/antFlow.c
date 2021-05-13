@@ -29,8 +29,8 @@ void moveAnts() {
     }
 
     manageFlow(channel1, &channel1LeftQueue, &channel1RightQueue, &currentChannel1Ants, elapsedSign1Time, sign1Begin, sign1End);
-  //  manageFlow(channel2, &channel2LeftQueue, &channel2RightQueue, currentChannel2Ants, elapsedSign2Time, sign2Begin, sign2End);
-  //  manageFlow(channel3, &channel3LeftQueue, &channel3RightQueue, currentChannel3Ants, elapsedSign3Time, sign3Begin, sign3End);
+    manageFlow(channel2, &channel2LeftQueue, &channel2RightQueue, &currentChannel2Ants, elapsedSign2Time, sign2Begin, sign2End);
+    manageFlow(channel3, &channel3LeftQueue, &channel3RightQueue, &currentChannel3Ants, elapsedSign3Time, sign3Begin, sign3End);
 
     return;
 }
