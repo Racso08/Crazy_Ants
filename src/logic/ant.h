@@ -23,6 +23,7 @@ typedef struct {
     int time;
     int priority;
     int inChannel;
+    int waiting;
     int finalDest;
     int path;
     CEthread_t* thread;

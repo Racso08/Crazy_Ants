@@ -60,7 +60,6 @@ void initializePositions() {
 }
 
 int createAnt(int type, int channel, int dest, int extra) {
-
     int posX;
     int posY;
     int channelLenght;
@@ -70,13 +69,13 @@ int createAnt(int type, int channel, int dest, int extra) {
     int vel;
 
     switch (dest) {
+        case 0:
+            posX = 1100;
+            posY = 440;
+            break;
         case 1:
             posX = 80;
             posY= 440;
-            break;
-        case 2:
-            posX = 1100;
-            posY = 440;
             break;
     }
 
@@ -183,6 +182,7 @@ int createAntAux(int posX, int posY, int vel, int channelLenght, int dest, int t
     ant->time = time;
     ant->priority = priority;
     ant->inChannel = 0;
+    ant->waiting = 0;
     ant->finalDest = finalDest;
     ant->path = 0;
     ant->thread = &(thread[currentAntAmount]);
@@ -308,11 +308,13 @@ void* startAnt(void* arg) {
 
     int id = *(ant->thread) - 1;
     int channel = ant->channel;
+    ant->waiting = 1;
 
     printf("Soy la hormiga %d y estoy esperando a cruzar el canal %d\n", id, channel);
 
     while (1) {
         if (ant->inChannel == 1) {
+            ant->waiting = 0;
             break;
         }
         CEthread_yield();

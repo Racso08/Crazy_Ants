@@ -1,67 +1,74 @@
 #include "antFlow.h"
 
-void manageFlow(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueue, ant_t* currentChannelAnt, long elapsedSignTime, struct timespec signBegin, struct timespec signEnd);
+void manageFlow(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueue, queue* currentChannelAnts, long elapsedSignTime, struct timespec signBegin, struct timespec signEnd);
 
-void equity(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueue, ant_t* currentChannelAnt);
-void equityAux(channel_t* channel, queue* channelQueue, ant_t* currentChannelAnt);
-void equityFCFS(channel_t* channel, queue* channelQueue, ant_t* currentChannelAnt);
+void equity(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueue, queue* currentChannelAnts);
+void equityAux(channel_t* channel, queue* channelQueue, queue* currentChannelAnts);
+void equityRR(channel_t* channel, queue* channelQueue, ant_t* currentChannelAnt);
+void equityFCFS(channel_t* channel, queue* channelQueue, queue* currentChannelAnts);
 
 void sign(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueue, ant_t* currentChannelAnt, long elapsedSignTime, struct timespec signBegin, struct timespec signEnd);
 void tico(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueue, ant_t* currentChannelAnt);
 void signAndticoAux(channel_t* channel, queue* channelQueue, ant_t* currentChannelAnt);
 
-ant_t* currentChannel1Ant = NULL;
-ant_t* currentChannel2Ant = NULL;
-ant_t* currentChannel3Ant = NULL;
+queue currentChannel1Ants;
+queue currentChannel2Ants;
+queue currentChannel3Ants;
+
 long elapsedSign1Time = 0;
 long elapsedSign2Time = 0;
 long elapsedSign3Time = 0;
+int setupQueues = 0;
 
 void moveAnts() {
-    manageFlow(channel1, &channel1LeftQueue, &channel1RightQueue, currentChannel1Ant, elapsedSign1Time, sign1Begin, sign1End);
-    manageFlow(channel2, &channel2LeftQueue, &channel2RightQueue, currentChannel2Ant, elapsedSign2Time, sign2Begin, sign2End);
-    manageFlow(channel3, &channel3LeftQueue, &channel3RightQueue, currentChannel3Ant, elapsedSign3Time, sign3Begin, sign3End);
+    if (setupQueues == 0) {
+        queueInit(&currentChannel1Ants);
+        queueInit(&currentChannel2Ants);
+        queueInit(&currentChannel3Ants);
+        setupQueues = 1;
+    }
+
+    manageFlow(channel1, &channel1LeftQueue, &channel1RightQueue, &currentChannel1Ants, elapsedSign1Time, sign1Begin, sign1End);
+  //  manageFlow(channel2, &channel2LeftQueue, &channel2RightQueue, currentChannel2Ants, elapsedSign2Time, sign2Begin, sign2End);
+  //  manageFlow(channel3, &channel3LeftQueue, &channel3RightQueue, currentChannel3Ants, elapsedSign3Time, sign3Begin, sign3End);
 
     return;
 }
 
-void manageFlow(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueue, ant_t* currentChannelAnt, long elapsedSignTime, struct timespec signBegin, struct timespec signEnd) {
+void manageFlow(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueue, queue* currentChannelAnts, long elapsedSignTime, struct timespec signBegin, struct timespec signEnd) {
     switch (channel->flow) {
         case 0:
-            equity(channel, channelLeftQueue, channelRightQueue, currentChannelAnt);
+            equity(channel, channelLeftQueue, channelRightQueue, currentChannelAnts);
             break;
         case 1:
-            sign(channel, channelLeftQueue, channelRightQueue, currentChannelAnt, elapsedSignTime, signBegin, signEnd);
+           // sign(channel, channelLeftQueue, channelRightQueue, currentChannelAnt, elapsedSignTime, signBegin, signEnd);
             break;
         case 2:
-            tico(channel, channelLeftQueue, channelRightQueue, currentChannelAnt);
+           // tico(channel, channelLeftQueue, channelRightQueue, currentChannelAnt);
             break;
     }
 
     return;
 }
 
-void equity(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueue, ant_t* currentChannelAnt) {
+void equity(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueue, queue* currentChannelAnts) {
     if (channelLeftQueue->count == 0 && channelRightQueue->count > 0) {
         channel->currentW = 0;
         channel->sign = 1;
-        equityAux(channel, channelRightQueue, currentChannelAnt);
+        equityAux(channel, channelRightQueue, currentChannelAnts);
     }
     else if (channelLeftQueue->count > 0 && channelRightQueue->count == 0) {
         channel->currentW = 0;
         channel->sign = 0;
-        equityAux(channel, channelLeftQueue, currentChannelAnt);
-    }
-    else if (channelLeftQueue->count == 0 && channelRightQueue->count == 0) {
-        return;
+        equityAux(channel, channelLeftQueue, currentChannelAnts);
     }
     else {
         switch (channel->sign) {
             case 0:
-                equityAux(channel, channelLeftQueue, currentChannelAnt);
+                equityAux(channel, channelLeftQueue, currentChannelAnts);
                 break;
             case 1:
-                equityAux(channel, channelRightQueue, currentChannelAnt);
+                equityAux(channel, channelRightQueue, currentChannelAnts);
                 break;
         }
     }
@@ -69,7 +76,7 @@ void equity(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueu
     return;
 }
 
-void equityAux(channel_t* channel, queue* channelQueue, ant_t* currentChannelAnt) {
+void equityAux(channel_t* channel, queue* channelQueue, queue* currentChannelAnts) {
     switch (channel->scheduler) {
         case 0:
             //rr
@@ -81,7 +88,7 @@ void equityAux(channel_t* channel, queue* channelQueue, ant_t* currentChannelAnt
             // sjf
             break;
         case 3:
-            equityFCFS(channel, channelQueue, currentChannelAnt);
+            equityFCFS(channel, channelQueue, currentChannelAnts);
             break;
         case 4:
             // tr
@@ -91,23 +98,51 @@ void equityAux(channel_t* channel, queue* channelQueue, ant_t* currentChannelAnt
     return;
 }
 
-void equityFCFS(channel_t* channel, queue* channelQueue, ant_t* currentChannelAnt) {
-    if (currentChannelAnt != NULL) {
-        if (currentChannelAnt->inChannel == 1) {
+void equityRR(channel_t* channel, queue* channelQueue, ant_t* currentChannelAnt) {
+
+
+    return;
+}
+
+void equityFCFS(channel_t* channel, queue* channelQueue, queue* currentChannelAnts) {
+    if (currentChannelAnts->count > 0) {
+        ant_t* currentAnt = (ant_t*) currentChannelAnts->head->item;
+        if (currentAnt->inChannel == 1) {
             return;
         }
+        else {
+            queueGetFirstItem(currentChannelAnts);
+        }
     }
+    if (channelQueue->count > 0) {
+        ant_t* ant = (ant_t*) channelQueue->head->item;
+        if (ant->waiting == 1) { 
+            queueGetFirstItem(channelQueue);
 
-    ant_t* ant = (ant_t*) queueGetFirstItem(channelQueue);
-    ant->inChannel = 1;
-    currentChannelAnt = ant;
+            if (currentChannelAnts->count > 0) {
+                queueGetFirstItem(currentChannelAnts);
+            }
 
-    channel->currentW++;
-    if (channel->currentW == channel->w) {
-        channel->currentW = 0;
-        channel->sign = !channel->sign;
+            ant->waiting = 0;
+            ant->inChannel = 1;
+
+            queueAddItem(currentChannelAnts, ant);
+
+            channel->currentW++;
+            printf("w: %d", channel->currentW);
+            if (channel->currentW == channel->w) {
+                channel->currentW = 0;
+                switch (channel->sign) {
+                    case 0:
+                        channel->sign = 1;
+                        break;
+                    case 1:
+                        channel->sign = 0;
+                        break;
+                }
+            }
+        }
     }
-
     return;
 }
 

@@ -15,7 +15,6 @@
 #include "../logic/antFlow.h"
 
 SDL_Texture *initialize_texture_from_file(const char* file_name, SDL_Renderer *renderer);
-void waze(ant_t *ant);
 
 static const int width = 1200;
 static const int height = 700;
