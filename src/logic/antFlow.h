@@ -14,6 +14,6 @@
 
 struct timespec sign1Begin, sign1End, sign2Begin, sign2End, sign3Begin, sign3End;
 
-void moveAnts();
+void* moveAnts(void* arg);
 
 #endif

@@ -10,7 +10,7 @@
 #include <ucontext.h>
 #include "queue.h"
 
-#define QUANTUM 1000
+#define QUANTUM 500
 #define RUNNING 0
 #define DONE 1
 

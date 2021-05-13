@@ -23,7 +23,6 @@ void queueAddItem(queue* list, queueItem item) {
         while (tmp->next != NULL) {
             tmp = tmp->next;
         }
-        //node->prev = tmp;
         node->prev=tmp;
         tmp->next = node;
         node->item = item;
@@ -96,6 +95,5 @@ void queueDestroy(queue* list) {
     while(list->count != 0) {
         queueGetFirstItem(list);
     }
-    //free(list);
     return;
 }

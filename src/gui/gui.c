@@ -78,6 +78,11 @@ int main(int argc, char **argv)
 
     CEthread_init();
 
+    CEthread_t antMoverThread;
+
+    CEthread_create(&antMoverThread, moveAnts, NULL);
+    CEthread_detach(antMoverThread);
+
     while(running) {
         // Process events
          SDL_StartTextInput(); 
@@ -197,7 +202,7 @@ int main(int argc, char **argv)
         TTF_CloseFont(verdanaFont);
         */
 
-        moveAnts();
+        //moveAnts();
 
         //SPRITES
         if(allAnts.count > 0){

@@ -40,6 +40,18 @@ void initializeChannels() {
     queueInit(&channel2RightQueue);
     queueInit(&channel3LeftQueue);
     queueInit(&channel3RightQueue);
+
+    queueInit(&currentChannel1Ants);
+    queueInit(&currentChannel2Ants);
+    queueInit(&currentChannel3Ants);
+
+    queueInit(&channel1LeftEndQueue);
+    queueInit(&channel1RightEndQueue);
+    queueInit(&channel2LeftEndQueue);
+    queueInit(&channel2RightEndQueue);
+    queueInit(&channel3LeftEndQueue);
+    queueInit(&channel3RightEndQueue);
+
     queueInit(&allAnts);
 
     return;
