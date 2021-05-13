@@ -22,17 +22,13 @@ typedef struct {
     int scheduled;
 } channel_t;
 
-CEmutex_t channel1Mutex, channel1DataMutex;
-CEmutex_t channel2Mutex, channel2DataMutex;
-CEmutex_t channel3Mutex, channel3DataMutex;
-
 channel_t* channel1;
 channel_t* channel2;
 channel_t* channel3;
 
-queue channel1LeftQueue, channel1RightQueue;
-queue channel2LeftQueue, channel2RightQueue;
-queue channel3LeftQueue, channel3RightQueue;
+queue channel1LeftQueue, channel1RightQueue, channel1LeftEndQueue, channel1RightEndQueue;
+queue channel2LeftQueue, channel2RightQueue, channel2LeftEndQueue, channel2RightEndQueue;
+queue channel3LeftQueue, channel3RightQueue, channel3LeftEndQueue, channel3RightEndQueue;
 queue allAnts;
 
 void initializeChannels();

@@ -13,7 +13,9 @@
 
 typedef struct {
     int posX;
+    int nextAntPosX;
     int posY;
+    int nextAntPosY;
     int vel;
     int currentChannelPosition;
     int channelLenght;

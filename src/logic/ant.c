@@ -172,7 +172,9 @@ int createAntAux(int posX, int posY, int vel, int channelLenght, int dest, int t
 
     ant_t* ant = (ant_t*) malloc(sizeof(ant_t));
     ant->posX = posX;
+    ant->nextAntPosX = 0;
     ant->posY = posY;
+    ant->nextAntPosY = 0;
     ant->vel = vel;
     ant->currentChannelPosition = 0;
     ant->channelLenght = channelLenght;
@@ -300,8 +302,15 @@ void* startAnt(void* arg) {
     ant_t* ant = (ant_t*) arg;
 
     while (1) {
-        if (waze(ant) > 0) {
-            break;
+        if (ant->nextAntPosX == -1) {
+            if (waze(ant) > 0) {
+                break;
+            }
+        }
+        else if (abs(ant->nextAntPosX - ant->posX) > 10 || abs(ant->nextAntPosY - ant->posY) > 10) {
+            if (waze(ant) > 0) {
+                break;
+            }
         }
         CEthread_yield();
     }

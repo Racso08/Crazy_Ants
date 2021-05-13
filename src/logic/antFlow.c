@@ -2,6 +2,8 @@
 
 void manageFlow(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueue, queue* currentChannelAnts, long elapsedSignTime, struct timespec signBegin, struct timespec signEnd);
 
+void setNextAntsPositions();
+
 void equity(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueue, queue* currentChannelAnts);
 void equityAux(channel_t* channel, queue* channelQueue, queue* currentChannelAnts);
 void equityRR(channel_t* channel, queue* channelQueue, ant_t* currentChannelAnt);
@@ -28,9 +30,40 @@ void moveAnts() {
         setupQueues = 1;
     }
 
+    setNextAntsPositions(&channel1LeftQueue);
+
     manageFlow(channel1, &channel1LeftQueue, &channel1RightQueue, &currentChannel1Ants, elapsedSign1Time, sign1Begin, sign1End);
     manageFlow(channel2, &channel2LeftQueue, &channel2RightQueue, &currentChannel2Ants, elapsedSign2Time, sign2Begin, sign2End);
     manageFlow(channel3, &channel3LeftQueue, &channel3RightQueue, &currentChannel3Ants, elapsedSign3Time, sign3Begin, sign3End);
+
+    return;
+}
+
+void setNextAntsPositions(queue* list) {
+    int n = list->count;
+    if (n > 0) {
+        queueNode* node = (queueNode*) list->head;
+        ant_t* nextAnt = (ant_t*) node->item;
+
+        nextAnt->nextAntPosX = -1;
+        nextAnt->nextAntPosY = -1;
+
+        if (node->next == NULL) {
+            return;
+        }
+
+        ant_t* prevAnt;
+
+        while (node->next != NULL) {
+            prevAnt = (ant_t*) node->next->item;
+            prevAnt->nextAntPosX = nextAnt->posX;
+            prevAnt->nextAntPosY = nextAnt->posY;
+
+            nextAnt = prevAnt;
+
+            node = node->next;
+        }
+    }
 
     return;
 }
@@ -129,7 +162,6 @@ void equityFCFS(channel_t* channel, queue* channelQueue, queue* currentChannelAn
             queueAddItem(currentChannelAnts, ant);
 
             channel->currentW++;
-            printf("w: %d", channel->currentW);
             if (channel->currentW == channel->w) {
                 channel->currentW = 0;
                 switch (channel->sign) {
