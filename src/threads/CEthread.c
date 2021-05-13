@@ -118,25 +118,24 @@ void CEthread_end(void* returnValue) {
     currentThread = (cethread_t*) currentNode->item;
     currentThread->state = RUNNING;
 
-    // cethread_t* previousThread = currentThread; 
-    // currentThread = (cethread_t*) queueGetFirstItem(&readyQueue);
-    // currentThread->state = RUNNING; 
-
     free(previousThread->context->uc_stack.ss_sp); 
     free(previousThread->context);                
-    previousThread->context = NULL;
 
-    previousThread->state = DONE;
-    previousThread->join = 0;
-    previousThread->returnValue = NULL;
-
-    if (previousThread->detach == 0) {
-        previousThread->returnValue = returnValue;
+    if (previousThread->detach == 1) {
+        free(previousThread);
+        free(previousNode);
     }
+    else {
+        previousThread->context = NULL;
 
-    previousNode->next = NULL;
-    previousNode->prev = NULL;
-    queueAddNode(&finishQueue, previousNode);
+        previousThread->state = DONE;
+        previousThread->join = 0;
+
+        previousThread->returnValue = returnValue;
+        previousNode->next = NULL;
+        previousNode->prev = NULL;
+        queueAddNode(&finishQueue, previousNode);
+    }
 
     sigprocmask(SIG_UNBLOCK, &vtalrm, NULL); 
     setcontext(currentThread->context);
@@ -157,11 +156,6 @@ int CEthread_yield(void) {
 
     queueAddNode(&readyQueue, currentNode);
     currentNode = nextNode;
-
-    // cethread_t* nextThread = (cethread_t*) queueGetFirstItem(&readyQueue);
-    // cethread_t* previousThread = currentThread;
-    // queueAddItem(&readyQueue, currentThread);
-    // currentThread = nextThread;
 
     sigprocmask(SIG_UNBLOCK, &vtalrm, NULL); 
     swapcontext(previousThread->context, nextThread->context); 
@@ -266,7 +260,7 @@ int CEmutex_unlock(CEmutex_t* mutex) {
     return 0; 
 }
 
-int CEmutex_lock(CEmutex_t* mutex) {
+int CEmutex_trylock(CEmutex_t* mutex) {
     sigprocmask(SIG_BLOCK, &vtalrm, NULL); 
 
     cethread_t* currentThread = (cethread_t*) currentNode->item;
@@ -341,13 +335,6 @@ void scheduler(int signal) {
     queueAddNode(&readyQueue, currentNode);
     nextThread->state = RUNNING;
     currentNode = nextNode;
-
-    // cethread_t* nextThread = (cethread_t*) queueGetFirstItem(&readyQueue);
-
-    // cethread_t* previousThread = currentThread;
-    // queueAddItem(&readyQueue, currentThread);
-    // nextThread->state = RUNNING; 
-    // currentThread = nextThread;
 
     sigprocmask(SIG_UNBLOCK, &vtalrm, NULL); 
     swapcontext(previousThread->context, nextThread->context);
