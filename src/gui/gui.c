@@ -75,7 +75,8 @@ int main(int argc, char **argv)
     int canal4Counter = 0;
     int canal5Counter = 0;
     int canal6Counter = 0;
-
+    int index = 0;
+    
     CEthread_init();
 
     CEthread_t antMoverThread;
@@ -185,24 +186,7 @@ int main(int argc, char **argv)
         SDL_RenderClear(renderer);
 
         // Draw
-        SDL_RenderCopy(renderer, backgroundTxt, NULL, &backgroundRect); // BG
-
-        //Label
-        /*
-        TTF_Init();
-        TTF_Font *verdanaFont = TTF_OpenFont("src/gui/lazy.ttf", 50);
-        SDL_Color textColor = { 0, 0, 0, 255 };
-        SDL_Surface *textSurface = TTF_RenderText_Solid(verdanaFont, input, textColor);
-        SDL_Texture *textTexture = SDL_CreateTextureFromSurface(renderer, textSurface);
-        int w, h;
-        SDL_QueryTexture(textTexture,NULL,NULL,&w,&h);
-        SDL_Rect textRect = {470,60,w,h};
-        SDL_RenderCopy(renderer, textTexture, NULL, &textRect); // Label
-        TTF_Quit();
-        TTF_CloseFont(verdanaFont);
-        */
-
-        //moveAnts();
+        SDL_RenderCopy(renderer, backgroundTxt, NULL, &backgroundRect); // BGWS
 
         //SPRITES
         if(allAnts.count > 0){
@@ -211,8 +195,6 @@ int main(int argc, char **argv)
 
             while(temp != NULL){
                 ant = (ant_t*)temp->item;
-
-                // ANT 
 
                 if(ant->dest == 1){
                     if(ant->type == 0){
@@ -254,8 +236,41 @@ int main(int argc, char **argv)
                 }
                 
                 temp = temp->next;
-            }
+            } 
+        }
 
+        if (allAnts.count > 0) {
+            queueNode *temp = (queueNode*) allAnts.head;
+            ant_t *ant;
+            index = 0;
+
+            while (temp != NULL) {
+                ant = (ant_t*)temp->item;
+                
+                if (ant->path == -2) {
+                    if (index == 0) {
+                        if (temp->next != NULL) {
+                            temp->next->prev = NULL;
+                        }
+                        allAnts.head = temp->next;
+                    }
+                    else {
+                        temp->prev->next = temp->next;
+                        if (temp->next != NULL) {
+                            temp->next->prev = temp->prev;
+                        }
+                    }
+
+                    free(ant);
+                    free(temp);
+                    allAnts.count--;
+                    break;
+                }
+                else {
+                    index++;
+                    temp = temp->next;
+                }
+            }
         }
 
         // Show what was drawn
