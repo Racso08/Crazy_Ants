@@ -15,6 +15,6 @@
 struct timespec channel1Timer, channel2Timer, channel3Timer;
 long sign1Begin, sign2Begin, sign3Begin; 
 
-void* moveAnts(void* arg);
+void moveAnts();
 
 #endif

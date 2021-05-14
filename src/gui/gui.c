@@ -83,11 +83,6 @@ int main(int argc, char **argv)
     
     CEthread_init();
 
-    CEthread_t antMoverThread;
-
-    CEthread_create(&antMoverThread, moveAnts, NULL);
-    CEthread_detach(antMoverThread);
-
     while(running) {
         // Process events
         SDL_StartTextInput(); 
@@ -191,6 +186,8 @@ int main(int argc, char **argv)
 
         // Draw
         SDL_RenderCopy(renderer, backgroundTxt, NULL, &backgroundRect); // BGWS
+
+        moveAnts();
 
         //SPRITES
         if(allAnts.count > 0){

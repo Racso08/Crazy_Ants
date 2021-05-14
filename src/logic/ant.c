@@ -340,41 +340,41 @@ void addAntToQueue(ant_t* ant) {
 void* startAnt(void* arg) {
     ant_t* ant = (ant_t*) arg;
 
-    int id = *(ant->thread) - 2;
+    int id = *(ant->thread) - 1;
     int channel = ant->channel;
     int finalDest = ant->finalDest;
 
     printf("Hola, soy la hormiga %d y voy camino al canal %d\n", id, channel);
 
     while (1) {
-        if (ant->finalDest == ant->trueFinalDest) {
+        if (ant->finalDest == ant->trueFinalDest && ant->waiting == 0) {
             if (waze(ant) > 0) {
-                break;
+                printf("Soy la hormiga %d y estoy esperando a cruzar el canal %d\n", id, channel);
+                ant->waiting = 1;
             }
         }
-        else if (ant->nextAntPosX == -1) {
-            if (waze(ant) > 0) {
-            }
+        else if ((ant->nextAntPosX == -1 || abs(ant->nextAntPosX - ant->posX) > 30 || abs(ant->nextAntPosY - ant->posY) > 30) && ant->waiting == 0) {
+            waze(ant);
         }
-        else if (abs(ant->nextAntPosX - ant->posX) > 30 || abs(ant->nextAntPosY - ant->posY) > 30) {
-            if (waze(ant) > 0) {
-            }
+        else if (ant->inChannel == 1 && ant->waiting == 1) {
+            ant->waiting = 0;
+            break;
         }
 
         CEthread_yield();
     }
 
-    ant->waiting = 1;
+   // ant->waiting = 1;
 
-    printf("Soy la hormiga %d y estoy esperando a cruzar el canal %d\n", id, channel);
+  //  printf("Soy la hormiga %d y estoy esperando a cruzar el canal %d\n", id, channel);
 
-    while (1) {
+  /*  while (1) {
         if (ant->inChannel == 1) {
             ant->waiting = 0;
             break;
         }
         CEthread_yield();
-    }
+    }*/
 
     printf("Soy la hormiga %d y estoy cruzando el canal %d\n", id, channel);
 

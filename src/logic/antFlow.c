@@ -14,8 +14,8 @@ int FCFS(channel_t* channel, queue* channelQueue, queue* currentChannelAnts, que
 
 void advanceAnts(queue* channelQueue, queue* positions);
 
-void* moveAnts(void* arg) {
-    while (1) {
+void moveAnts() {
+    /*while (1) {
         checkIfAntArrived(&channel1LeftEndQueue);
         checkIfAntArrived(&channel1RightEndQueue);
         checkIfAntArrived(&channel2LeftEndQueue);
@@ -46,9 +46,38 @@ void* moveAnts(void* arg) {
         manageFlow(channel3, &channel3LeftQueue, &channel3RightQueue, &currentChannel3Ants, &channel3LeftEndQueue, &channel3RightEndQueue, &izq3, &der3, &sign3Begin, channel3Timer);
 
         CEthread_yield();
-    }
+    }*/
 
-    return NULL;
+    checkIfAntArrived(&channel1LeftEndQueue);
+    checkIfAntArrived(&channel1RightEndQueue);
+    checkIfAntArrived(&channel2LeftEndQueue);
+    checkIfAntArrived(&channel2RightEndQueue);
+    checkIfAntArrived(&channel3LeftEndQueue);
+    checkIfAntArrived(&channel3RightEndQueue);
+
+    setNextAntsPositions(&channel1LeftQueue);
+    setNextAntsPositions(&channel1RightQueue);
+    setNextAntsPositions(&channel2LeftQueue);
+    setNextAntsPositions(&channel2RightQueue);
+    setNextAntsPositions(&channel3LeftQueue);
+    setNextAntsPositions(&channel3RightQueue);
+
+    setNextAntsPositions(&currentChannel1Ants);
+    setNextAntsPositions(&currentChannel2Ants);
+    setNextAntsPositions(&currentChannel3Ants);
+
+    setNextAntsPositions(&channel1LeftEndQueue);
+    setNextAntsPositions(&channel1RightEndQueue);
+    setNextAntsPositions(&channel2LeftEndQueue);
+    setNextAntsPositions(&channel2RightEndQueue);
+    setNextAntsPositions(&channel3LeftEndQueue);
+    setNextAntsPositions(&channel3RightEndQueue);
+
+    manageFlow(channel1, &channel1LeftQueue, &channel1RightQueue, &currentChannel1Ants, &channel1LeftEndQueue, &channel1RightEndQueue, &izq1, &der1, &sign1Begin, channel1Timer);
+    manageFlow(channel2, &channel2LeftQueue, &channel2RightQueue, &currentChannel2Ants, &channel2LeftEndQueue, &channel2RightEndQueue, &izq2, &der2, &sign2Begin, channel2Timer);
+    manageFlow(channel3, &channel3LeftQueue, &channel3RightQueue, &currentChannel3Ants, &channel3LeftEndQueue, &channel3RightEndQueue, &izq3, &der3, &sign3Begin, channel3Timer);
+
+    return;
 }
 
 void setNextAntsPositions(queue* list) {
@@ -156,15 +185,13 @@ void sign(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueue,
         *signBegin = channelTimer.tv_sec;
     }
 
-    else {
-        switch (channel->sign) {
-            case 0:
-                schedulerHandler(channel, channelLeftQueue, currentChannelAnts, channelRightEndQueue, izqPositions);
-                break;
-            case 1:
-                schedulerHandler(channel, channelRightQueue, currentChannelAnts, channelLeftEndQueue, derPositions);
-                break;
-        }
+    switch (channel->sign) {
+        case 0:
+            schedulerHandler(channel, channelLeftQueue, currentChannelAnts, channelRightEndQueue, izqPositions);
+            break;
+        case 1:
+            schedulerHandler(channel, channelRightQueue, currentChannelAnts, channelLeftEndQueue, derPositions);
+            break;
     }
     
     return;
