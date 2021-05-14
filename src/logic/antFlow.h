@@ -12,7 +12,8 @@
 #include "channel.h"
 #include "ant.h"
 
-struct timespec sign1Begin, sign1End, sign2Begin, sign2End, sign3Begin, sign3End;
+struct timespec channel1Timer, channel2Timer, channel3Timer;
+long sign1Begin, sign2Begin, sign3Begin; 
 
 void* moveAnts(void* arg);
 

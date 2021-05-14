@@ -1,6 +1,7 @@
 #include "ant.h"
 
 int checkIfIsPossibleToAddAnt(int channel, int dest);
+int getTrueFinalDestination(int channel, int dest);
 int createAntAux(int posX, int posY, int vel, int channelLenght, int dest, int type, int channel, int time, int priority);
 void addAntToQueue(ant_t* ant);
 int queueGetValueInPosition(queue* list, int position);
@@ -146,13 +147,13 @@ int createAnt(int type, int channel, int dest, int extra) {
             break;
         case 1:
             if (vel < 0) {
-                vel = (int) channelLenght * scale / 80;
+                vel = (int) (channelLenght * scale / 80);
             }
 
             break;
         case 2:
             if (vel < 0) {
-                vel = (int) channelLenght * scale / 60;
+                vel = (int) (channelLenght * scale / 60);
             }
     }
 
@@ -186,6 +187,7 @@ int createAntAux(int posX, int posY, int vel, int channelLenght, int dest, int t
     ant->inChannel = 0;
     ant->waiting = 0;
     ant->finalDest = finalDest;
+    ant->trueFinalDest = getTrueFinalDestination(channel, dest);
     ant->path = 0;
     ant->thread = &(thread[currentAntAmount]);
 
@@ -249,6 +251,43 @@ int checkIfIsPossibleToAddAnt(int channel, int dest) {
     return -1;
 }
 
+int getTrueFinalDestination(int channel, int dest) {
+    switch (channel) {
+        case 1:
+            switch (dest) {
+            case 0:
+                return 770;
+                break;
+            case 1:
+                return 520;
+                break;
+            }
+            break;
+        case 2:
+            switch (dest) {
+            case 0:
+                return 730;
+                break;
+            case 1:
+                return 410;
+                break;
+            }
+            break;
+        case 3:
+            switch (dest) {
+            case 0:
+                return 850;
+                break;
+            case 1:
+                return 370;
+                break;
+            }
+            break;
+    }
+
+    return -1;
+}
+
 int queueGetValueInPosition(queue* list, int position) {
     queueNode* node = (queueNode*) list->head;
     
@@ -303,20 +342,25 @@ void* startAnt(void* arg) {
 
     int id = *(ant->thread) - 2;
     int channel = ant->channel;
+    int finalDest = ant->finalDest;
 
     printf("Hola, soy la hormiga %d y voy camino al canal %d\n", id, channel);
 
     while (1) {
-        if (ant->nextAntPosX == -1) {
+        if (ant->finalDest == ant->trueFinalDest) {
             if (waze(ant) > 0) {
                 break;
+            }
+        }
+        else if (ant->nextAntPosX == -1) {
+            if (waze(ant) > 0) {
             }
         }
         else if (abs(ant->nextAntPosX - ant->posX) > 30 || abs(ant->nextAntPosY - ant->posY) > 30) {
             if (waze(ant) > 0) {
-                break;
             }
         }
+
         CEthread_yield();
     }
 

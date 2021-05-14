@@ -8,6 +8,7 @@
 #include <stdbool.h>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_image.h>
+#include <time.h>
 
 #include "../logic/ant.h"
 #include "../logic/channel.h"
@@ -25,9 +26,12 @@ int main(int argc, char **argv)
     srand(time(0));
 	initializeChannels();
     initializePositions();
-	clock_gettime(CLOCK_REALTIME, &sign1Begin);
-	clock_gettime(CLOCK_REALTIME, &sign2Begin);
-	clock_gettime(CLOCK_REALTIME, &sign3Begin);
+	clock_gettime(CLOCK_REALTIME, &channel1Timer);
+    clock_gettime(CLOCK_REALTIME, &channel2Timer);
+    clock_gettime(CLOCK_REALTIME, &channel3Timer);
+    sign1Begin = channel1Timer.tv_sec;
+    sign2Begin = channel2Timer.tv_sec;
+    sign3Begin = channel3Timer.tv_sec;
     
     // Initialize SDL
     SDL_Init(SDL_INIT_VIDEO);
@@ -86,14 +90,14 @@ int main(int argc, char **argv)
 
     while(running) {
         // Process events
-         SDL_StartTextInput(); 
+        SDL_StartTextInput(); 
 
         while(SDL_PollEvent(&event)) {
             if(event.type == SDL_QUIT) {
                 running = false;
             }
             
-             else if(event.type == SDL_TEXTINPUT) {
+            else if(event.type == SDL_TEXTINPUT) {
                 strcat(input,event.text.text);
             }
 
@@ -156,8 +160,8 @@ int main(int argc, char **argv)
 
                     case SDLK_i:
                         SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_INFORMATION,
-                        "Comandos",
-                        "z: hormiga normal\nx: hormiga zompopa\nc: hormiga reina\nn: hormiguero izquierdo\nm: hormiguero derecho\nj: canal 1\nk: canal 2\nl: canal 3",
+                        "Instrucciones para crear una hormiga",
+                        "Tipo de Hormiga: Z - Normal, X - Zompopa, C - Reina\n Canal de la Hormiga: J - Canal 1, K - Canal 2, L - Canal 3\n Hormiguero Destino: N - Hormiguero Izquierdo, M - Hormiguero Derecho\n Parametro Extra: Digitelo y Presione E",
                         NULL);
                         break;
                         
@@ -174,7 +178,7 @@ int main(int argc, char **argv)
                             strcpy(input,"");
                         }
                         else {
-                            printf("Por favor ingrese los parametros de la hormiga");
+                            printf("Por favor ingrese los parametros de la hormiga\n");
                         }
 
                         break;

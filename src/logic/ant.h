@@ -27,6 +27,7 @@ typedef struct {
     int inChannel;
     int waiting;
     int finalDest;
+    int trueFinalDest;
     int path;
     CEthread_t* thread;
 } ant_t;

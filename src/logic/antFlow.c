@@ -1,25 +1,18 @@
 #include "antFlow.h"
 
-void manageFlow(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueue, queue* currentChannelAnts, queue* channelLeftEndQueue, queue* channelRightEndQueue, long elapsedSignTime, struct timespec signBegin, struct timespec signEnd);
+void manageFlow(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueue, queue* currentChannelAnts, queue* channelLeftEndQueue, queue* channelRightEndQueue, queue* izqPositions, queue* derPositions, long* signBegin, struct timespec channelTimer);
 void checkIfAntArrived(queue* list);
 void setNextAntsPositions(queue* list);
 
-void equity(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueue, queue* currentChannelAnts, queue* channelLeftEndQueue, queue* channelRightEndQueue);
-void equityAux(channel_t* channel, queue* channelQueue, queue* currentChannelAnts, queue* channelEndQueue);
-void equityRR(channel_t* channel, queue* channelQueue, ant_t* currentChannelAnt);
-void equityFCFS(channel_t* channel, queue* channelQueue, queue* currentChannelAnts, queue* channelEndQueue);
+void equity(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueue, queue* currentChannelAnts, queue* channelLeftEndQueue, queue* channelRightEndQueue, queue* izqPositions, queue* derPositions);
+void sign(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueue, queue* currentChannelAnts, queue* channelLeftEndQueue, queue* channelRightEndQueue, queue* izqPositions, queue* derPositions, long* signBegin, struct timespec channelTimer);
+void tico(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueue, queue* currentChannelAnts, queue* channelLeftEndQueue, queue* channelRightEndQueue, queue* izqPositions, queue* derPositions);
 
-void sign(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueue, ant_t* currentChannelAnt, long elapsedSignTime, struct timespec signBegin, struct timespec signEnd);
-void tico(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueue, ant_t* currentChannelAnt);
-void signAndticoAux(channel_t* channel, queue* channelQueue, ant_t* currentChannelAnt);
+int schedulerHandler(channel_t* channel, queue* channelQueue, queue* currentChannelAnts, queue* channelEndQueue, queue* positions);
 
-queue currentChannel1Ants;
-queue currentChannel2Ants;
-queue currentChannel3Ants;
+int FCFS(channel_t* channel, queue* channelQueue, queue* currentChannelAnts, queue* channelEndQueue, queue* positions);
 
-long elapsedSign1Time = 0;
-long elapsedSign2Time = 0;
-long elapsedSign3Time = 0;
+void advanceAnts(queue* channelQueue, queue* positions);
 
 void* moveAnts(void* arg) {
     while (1) {
@@ -48,9 +41,9 @@ void* moveAnts(void* arg) {
         setNextAntsPositions(&channel3LeftEndQueue);
         setNextAntsPositions(&channel3RightEndQueue);
 
-        manageFlow(channel1, &channel1LeftQueue, &channel1RightQueue, &currentChannel1Ants, &channel1LeftEndQueue, &channel1RightEndQueue, elapsedSign1Time, sign1Begin, sign1End);
-        manageFlow(channel2, &channel2LeftQueue, &channel2RightQueue, &currentChannel2Ants, &channel2LeftEndQueue, &channel2RightEndQueue, elapsedSign2Time, sign2Begin, sign2End);
-        manageFlow(channel3, &channel3LeftQueue, &channel3RightQueue, &currentChannel3Ants, &channel3LeftEndQueue, &channel3RightEndQueue, elapsedSign3Time, sign3Begin, sign3End);
+        manageFlow(channel1, &channel1LeftQueue, &channel1RightQueue, &currentChannel1Ants, &channel1LeftEndQueue, &channel1RightEndQueue, &izq1, &der1, &sign1Begin, channel1Timer);
+        manageFlow(channel2, &channel2LeftQueue, &channel2RightQueue, &currentChannel2Ants, &channel2LeftEndQueue, &channel2RightEndQueue, &izq2, &der2, &sign2Begin, channel2Timer);
+        manageFlow(channel3, &channel3LeftQueue, &channel3RightQueue, &currentChannel3Ants, &channel3LeftEndQueue, &channel3RightEndQueue, &izq3, &der3, &sign3Begin, channel3Timer);
 
         CEthread_yield();
     }
@@ -102,40 +95,80 @@ void checkIfAntArrived(queue* list) {
     return;
 }
 
-void manageFlow(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueue, queue* currentChannelAnts, queue* channelLeftEndQueue, queue* channelRightEndQueue, long elapsedSignTime, struct timespec signBegin, struct timespec signEnd) {
+void manageFlow(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueue, queue* currentChannelAnts, queue* channelLeftEndQueue, queue* channelRightEndQueue, queue* izqPositions, queue* derPositions, long* signBegin, struct timespec channelTimer) {
     switch (channel->flow) {
         case 0:
-            equity(channel, channelLeftQueue, channelRightQueue, currentChannelAnts, channelLeftEndQueue, channelRightEndQueue);
+            equity(channel, channelLeftQueue, channelRightQueue, currentChannelAnts, channelLeftEndQueue, channelRightEndQueue, izqPositions, derPositions);
             break;
         case 1:
-           // sign(channel, channelLeftQueue, channelRightQueue, currentChannelAnt, elapsedSignTime, signBegin, signEnd);
+            sign(channel, channelLeftQueue, channelRightQueue, currentChannelAnts, channelLeftEndQueue, channelRightEndQueue, izqPositions, derPositions, signBegin, channelTimer);
             break;
         case 2:
-           // tico(channel, channelLeftQueue, channelRightQueue, currentChannelAnt);
+            tico(channel, channelLeftQueue, channelRightQueue, currentChannelAnts, channelLeftEndQueue, channelRightEndQueue, izqPositions, derPositions);
             break;
     }
 
     return;
 }
 
-void equity(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueue, queue* currentChannelAnts, queue* channelLeftEndQueue, queue* channelRightEndQueue) {
+void equity(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueue, queue* currentChannelAnts, queue* channelLeftEndQueue, queue* channelRightEndQueue, queue* izqPositions, queue* derPositions) {
+    int success = 0;
+
     if (channelLeftQueue->count == 0 && channelRightQueue->count > 0) {
         channel->currentW = 0;
         channel->sign = 1;
-        equityAux(channel, channelRightQueue, currentChannelAnts, channelLeftEndQueue);
+        success = schedulerHandler(channel, channelRightQueue, currentChannelAnts, channelLeftEndQueue, derPositions);
     }
     else if (channelLeftQueue->count > 0 && channelRightQueue->count == 0) {
         channel->currentW = 0;
         channel->sign = 0;
-        equityAux(channel, channelLeftQueue, currentChannelAnts, channelRightEndQueue);
+        success = schedulerHandler(channel, channelLeftQueue, currentChannelAnts, channelRightEndQueue, izqPositions);
     }
     else {
         switch (channel->sign) {
             case 0:
-                equityAux(channel, channelLeftQueue, currentChannelAnts, channelRightEndQueue);
+                success = schedulerHandler(channel, channelLeftQueue, currentChannelAnts, channelRightEndQueue, izqPositions);
                 break;
             case 1:
-                equityAux(channel, channelRightQueue, currentChannelAnts, channelLeftEndQueue);
+                success = schedulerHandler(channel, channelRightQueue, currentChannelAnts, channelLeftEndQueue, derPositions);
+                break;
+        }
+    }
+
+    if (success == 1) {
+        channel->currentW++;
+        if (channel->currentW == channel->w) {
+            channel->currentW = 0;
+            channel->sign = !channel->sign;
+        }
+    }
+    
+    return;
+}
+
+void sign(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueue, queue* currentChannelAnts, queue* channelLeftEndQueue, queue* channelRightEndQueue, queue* izqPositions, queue* derPositions, long* signBegin, struct timespec channelTimer) {
+    clock_gettime(CLOCK_REALTIME, &channelTimer);
+    long elapsedSignTime = channelTimer.tv_sec - *signBegin;
+
+    if (elapsedSignTime >= channel->time) {
+        channel->sign = !channel->sign;
+        clock_gettime(CLOCK_REALTIME, &channelTimer);
+        *signBegin = channelTimer.tv_sec;
+    }
+
+    if (channel->sign == 1 && channelRightQueue->count > 0) {
+        schedulerHandler(channel, channelRightQueue, currentChannelAnts, channelLeftEndQueue, derPositions);
+    }
+    else if (channelLeftQueue->count > 0 && channel->sign == 1) {
+        schedulerHandler(channel, channelLeftQueue, currentChannelAnts, channelRightEndQueue, izqPositions);
+    }
+    else {
+        switch (channel->sign) {
+            case 0:
+                schedulerHandler(channel, channelLeftQueue, currentChannelAnts, channelRightEndQueue, izqPositions);
+                break;
+            case 1:
+                schedulerHandler(channel, channelRightQueue, currentChannelAnts, channelLeftEndQueue, derPositions);
                 break;
         }
     }
@@ -143,7 +176,29 @@ void equity(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueu
     return;
 }
 
-void equityAux(channel_t* channel, queue* channelQueue, queue* currentChannelAnts, queue* channelEndQueue) {
+void tico(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueue, queue* currentChannelAnts, queue* channelLeftEndQueue, queue* channelRightEndQueue, queue* izqPositions, queue* derPositions) {
+    if (channelLeftQueue->count == 0 && channelRightQueue->count > 0) {
+        schedulerHandler(channel, channelRightQueue, currentChannelAnts, channelLeftEndQueue, derPositions);
+    }
+    else if (channelLeftQueue->count > 0 && channelRightQueue->count == 0) {
+        schedulerHandler(channel, channelLeftQueue, currentChannelAnts, channelRightEndQueue, izqPositions);
+    }
+    else {
+        int random = (rand() % 2);
+        switch (random) {
+            case 0:
+                schedulerHandler(channel, channelLeftQueue, currentChannelAnts, channelRightEndQueue, izqPositions);
+                break;
+            case 1:
+                schedulerHandler(channel, channelRightQueue, currentChannelAnts, channelLeftEndQueue, derPositions);
+                break;
+        }
+    }
+
+    return;
+}
+
+int schedulerHandler(channel_t* channel, queue* channelQueue, queue* currentChannelAnts, queue* channelEndQueue, queue* positions) {
     switch (channel->scheduler) {
         case 0:
             //rr
@@ -155,27 +210,21 @@ void equityAux(channel_t* channel, queue* channelQueue, queue* currentChannelAnt
             // sjf
             break;
         case 3:
-            equityFCFS(channel, channelQueue, currentChannelAnts, channelEndQueue);
+            return FCFS(channel, channelQueue, currentChannelAnts, channelEndQueue, positions);
             break;
         case 4:
             // tr
             break;
     }
 
-    return;
+    return 0;
 }
 
-void equityRR(channel_t* channel, queue* channelQueue, ant_t* currentChannelAnt) {
-
-
-    return;
-}
-
-void equityFCFS(channel_t* channel, queue* channelQueue, queue* currentChannelAnts, queue* channelEndQueue) {
+int FCFS(channel_t* channel, queue* channelQueue, queue* currentChannelAnts, queue* channelEndQueue, queue* positions) {
     if (currentChannelAnts->count > 0) {
         ant_t* currentAnt = (ant_t*) currentChannelAnts->head->item;
         if (currentAnt->inChannel == 1) {
-            return;
+            return 0;
         }
         else {
             queueGetFirstItem(currentChannelAnts);
@@ -196,90 +245,32 @@ void equityFCFS(channel_t* channel, queue* channelQueue, queue* currentChannelAn
 
             queueAddItem(currentChannelAnts, ant);
 
-            channel->currentW++;
-            if (channel->currentW == channel->w) {
-                channel->currentW = 0;
-                switch (channel->sign) {
-                    case 0:
-                        channel->sign = 1;
-                        break;
-                    case 1:
-                        channel->sign = 0;
-                        break;
-                }
+            if (channelQueue->count > 0) {
+                advanceAnts(channelQueue, positions);
             }
+
+            return 1;
         }
     }
-    return;
+    return 0;
 }
 
-void sign(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueue, ant_t* currentChannelAnt, long elapsedSignTime, struct timespec signBegin, struct timespec signEnd) {
-    clock_gettime(CLOCK_REALTIME, &signEnd);
-    elapsedSignTime += signEnd.tv_sec - signBegin.tv_sec;
-    if (elapsedSignTime >= channel->time) {
-        elapsedSignTime = 0;
-        channel->sign = !channel->sign;
-        clock_gettime(CLOCK_REALTIME, &signBegin);
-    }
+void advanceAnts(queue* channelQueue, queue* positions) {
+    queueNode* antNode = (queueNode*) channelQueue->head;
+    queueNode* positionNode = (queueNode*) positions->head;
 
-    if (channel->sign == 1 && channelRightQueue->count > 0) {
-        signAndticoAux(channel, channelRightQueue, currentChannelAnt);
-    }
-    else if (channelLeftQueue->count > 0 && channel->sign == 1) {
-        signAndticoAux(channel, channelLeftQueue, currentChannelAnt);
-    }
-    else if (channelLeftQueue->count == 0 && channelRightQueue->count == 0) {
-        return;
-    }
-    else {
-        switch (channel->sign) {
-            case 0:
-                signAndticoAux(channel, channelLeftQueue, currentChannelAnt);
-                break;
-            case 1:
-                signAndticoAux(channel, channelRightQueue, currentChannelAnt);
-                break;
-        }
+    ant_t* ant;
+    int position;
+
+    while (antNode != NULL) {
+        ant = (ant_t*) antNode->item;
+        position = (int) (__intptr_t) positionNode->item;
+
+        ant->finalDest = position;
+
+        antNode = antNode->next;
+        positionNode = positionNode->next;        
     }
     
-    return;
-}
-
-void tico(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueue, ant_t* currentChannelAnt) {
-    if (channelLeftQueue->count == 0 && channelRightQueue->count > 0) {
-        signAndticoAux(channel, channelRightQueue, currentChannelAnt);
-    }
-    else if (channelLeftQueue->count > 0 && channelRightQueue->count == 0) {
-        signAndticoAux(channel, channelLeftQueue, currentChannelAnt);
-    }
-    else if (channelLeftQueue->count == 0 && channelRightQueue->count == 0) {
-        return;
-    }
-    else {
-        int random = (rand() % 2);
-        switch (random) {
-            case 0:
-                signAndticoAux(channel, channelLeftQueue, currentChannelAnt);
-                break;
-            case 1:
-                signAndticoAux(channel, channelRightQueue, currentChannelAnt);
-                break;
-        }
-    }
-
-    return;
-}
-
-void signAndticoAux(channel_t* channel, queue* channelQueue, ant_t* currentChannelAnt) {
-    if (currentChannelAnt != NULL) {
-        if (currentChannelAnt->inChannel == 1) {
-            return;
-        }
-    }
-
-    ant_t* ant = (ant_t*) queueGetFirstItem(channelQueue);
-    ant->inChannel = 1;
-    currentChannelAnt = ant;
-
     return;
 }
