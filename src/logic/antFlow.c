@@ -156,12 +156,6 @@ void sign(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueue,
         *signBegin = channelTimer.tv_sec;
     }
 
-    if (channel->sign == 1 && channelRightQueue->count > 0) {
-        schedulerHandler(channel, channelRightQueue, currentChannelAnts, channelLeftEndQueue, derPositions);
-    }
-    else if (channelLeftQueue->count > 0 && channel->sign == 1) {
-        schedulerHandler(channel, channelLeftQueue, currentChannelAnts, channelRightEndQueue, izqPositions);
-    }
     else {
         switch (channel->sign) {
             case 0:
