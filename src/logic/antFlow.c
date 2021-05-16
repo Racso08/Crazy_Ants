@@ -10,7 +10,7 @@ void tico(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueue,
 
 int schedulerHandler(channel_t* channel, queue* channelQueue, queue* currentChannelAnts, queue* channelEndQueue, queue* positions);
 
-int FCFS(channel_t* channel, queue* channelQueue, queue* currentChannelAnts, queue* channelEndQueue, queue* positions);
+int PR__SJF_FCFS_RT(channel_t* channel, queue* channelQueue, queue* currentChannelAnts, queue* channelEndQueue, queue* positions);
 
 void advanceAnts(queue* channelQueue, queue* positions);
 
@@ -192,23 +192,23 @@ int schedulerHandler(channel_t* channel, queue* channelQueue, queue* currentChan
             //rr
             break;
         case 1:
-            // prio
+            return PR__SJF_FCFS_RT(channel, channelQueue, currentChannelAnts, channelEndQueue, positions);
             break;
         case 2:
-            // sjf
+            return PR__SJF_FCFS_RT(channel, channelQueue, currentChannelAnts, channelEndQueue, positions);
             break;
         case 3:
-            return FCFS(channel, channelQueue, currentChannelAnts, channelEndQueue, positions);
+            return PR__SJF_FCFS_RT(channel, channelQueue, currentChannelAnts, channelEndQueue, positions);
             break;
         case 4:
-            // tr
+            return PR__SJF_FCFS_RT(channel, channelQueue, currentChannelAnts, channelEndQueue, positions);
             break;
     }
 
     return 0;
 }
 
-int FCFS(channel_t* channel, queue* channelQueue, queue* currentChannelAnts, queue* channelEndQueue, queue* positions) {
+int PR__SJF_FCFS_RT(channel_t* channel, queue* channelQueue, queue* currentChannelAnts, queue* channelEndQueue, queue* positions) {
     if (currentChannelAnts->count > 0) {
         ant_t* currentAnt = (ant_t*) currentChannelAnts->head->item;
         if (currentAnt->inChannel == 1) {

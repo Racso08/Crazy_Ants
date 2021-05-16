@@ -9,6 +9,9 @@
 #include "channel.h"
 #include "ant.h"
 
+char *times;
+char *priorities;
+
 void scheduleAnts(int channel, int dest);
 
 #endif

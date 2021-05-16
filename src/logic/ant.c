@@ -86,9 +86,17 @@ int createAnt(int type, int channel, int dest, int extra) {
             channelTrueLenght = channel1->trueLenght;
         
             if(channel1->scheduler == 1){
+                if (extra < 0) {
+                    printf("Por favor ingrese la prioridad de la hormiga\n");
+                    return 0;
+                }
                 priority = extra;
                 channelTime = -1;
             }else if(channel1->scheduler == 2 || channel1->scheduler == 4){
+                if (extra <= 24) {
+                    printf("Por favor ingrese el tiempo de la hormiga\n");
+                    return 0;
+                }
                 channelTime = extra;
                 priority = -1;
             }else {
@@ -101,9 +109,17 @@ int createAnt(int type, int channel, int dest, int extra) {
             channelTrueLenght = channel2->trueLenght;
 
             if(channel2->scheduler == 1){
+                if (extra < 0) {
+                    printf("Por favor ingrese la prioridad de la hormiga\n");
+                    return 0;
+                }
                 priority = extra;
                 channelTime = -1;
             }else if(channel2->scheduler == 2 || channel2->scheduler == 4){
+                if (extra <= 24) {
+                    printf("Por favor ingrese el tiempo de la hormiga\n");
+                    return 0;
+                }
                 channelTime = extra;
                 priority = -1;
             }else {
@@ -117,9 +133,17 @@ int createAnt(int type, int channel, int dest, int extra) {
             channelTrueLenght = channel3->trueLenght;
 
             if(channel3->scheduler == 1){
+                if (extra < 0) {
+                    printf("Por favor ingrese la prioridad de la hormiga\n");
+                    return 0;
+                }
                 priority = extra;
                 channelTime = -1;
             }else if(channel3->scheduler == 2 || channel3->scheduler == 4){
+                if (extra <= 24) {
+                    printf("Por favor ingrese el tiempo de la hormiga\n");
+                    return 0;
+                }
                 channelTime = extra;
                 priority = -1;
             }else {
@@ -128,10 +152,6 @@ int createAnt(int type, int channel, int dest, int extra) {
             } 
 
             break;
-    }
-
-    if (type == 2) {
-        channelTime = extra;
     }
 
     int scale = (int) (channelTrueLenght / channelLenght);
@@ -172,6 +192,11 @@ int createAntAux(int posX, int posY, int vel, int channelLenght, int dest, int t
     }
 
     ant_t* ant = (ant_t*) malloc(sizeof(ant_t));
+    if (ant == NULL) {
+        printf("Error, no se pudo alocar memoria");
+        exit(EXIT_FAILURE);
+    }
+
     ant->posX = posX;
     ant->nextAntPosX = 0;
     ant->posY = posY;
@@ -189,6 +214,7 @@ int createAntAux(int posX, int posY, int vel, int channelLenght, int dest, int t
     ant->finalDest = finalDest;
     ant->trueFinalDest = getTrueFinalDestination(channel, dest);
     ant->path = 0;
+    ant->reorganizing = 0;
     ant->thread = &(thread[currentAntAmount]);
 
     CEthread_create(&(thread[currentAntAmount]), startAnt, (void*) ant);
@@ -347,7 +373,12 @@ void* startAnt(void* arg) {
     printf("Hola, soy la hormiga %d y voy camino al canal %d\n", id, channel);
 
     while (1) {
-        if (ant->finalDest == ant->trueFinalDest && ant->waiting == 0) {
+        if (ant->reorganizing == 1 && ant->waiting == 0) {
+            if (waze(ant) > 0) {
+                ant->reorganizing = 0;
+            }
+        }
+        else if (ant->finalDest == ant->trueFinalDest && ant->waiting == 0) {
             if (waze(ant) > 0) {
                 printf("Soy la hormiga %d y estoy esperando a cruzar el canal %d\n", id, channel);
                 ant->waiting = 1;

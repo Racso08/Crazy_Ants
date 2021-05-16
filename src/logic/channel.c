@@ -59,6 +59,11 @@ void initializeChannels() {
 
 void initializeChannelsAux(FILE* fp, int id) {
     channel_t* channel = (channel_t*) malloc(sizeof(channel_t));
+    if (channel == NULL) {
+        printf("Error, no se pudo alocar memoria");
+        exit(EXIT_FAILURE);
+    }
+
     char line[100];
     char* data;
 

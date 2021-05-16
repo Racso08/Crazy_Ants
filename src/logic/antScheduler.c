@@ -1,6 +1,7 @@
 #include "antScheduler.h"
 
-void scheduleAntsAux(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueue, int dest);
+void scheduleAntsAux(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueue, int dest, queue* izqPositions, queue* derPositions);
+void updateAntPositions(queue* channelQueue, queue* positions);
 int scheduleChannel(int scheduler, queue* list);
 void queuePrintPriority(queue* list);
 void queuePrintTime(queue* list);
@@ -12,33 +13,63 @@ int sjfSchedule(queue* list);
 void scheduleAnts(int channel, int dest) {
     switch (channel) {
         case 1:
-            scheduleAntsAux(channel1, &channel1LeftQueue, &channel1RightQueue, dest);
+            scheduleAntsAux(channel1, &channel1LeftQueue, &channel1RightQueue, dest, &izq1, &der1);
             break;
         
         case 2:
-            scheduleAntsAux(channel2, &channel2LeftQueue, &channel2RightQueue, dest);
+            scheduleAntsAux(channel2, &channel2LeftQueue, &channel2RightQueue, dest, &izq2, &der2);
             break;
 
         case 3:
-            scheduleAntsAux(channel3, &channel3LeftQueue, &channel3RightQueue, dest);
+            scheduleAntsAux(channel3, &channel3LeftQueue, &channel3RightQueue, dest, &izq3, &der3);
             break;
     }
 
     return;
 }
 
-void scheduleAntsAux(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueue, int dest) {
+void scheduleAntsAux(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueue, int dest, queue* izqPositions, queue* derPositions) {
     switch (dest) {
         case 0:
             if (channelRightQueue->count > 1) {
                 channel->scheduled = scheduleChannel(channel->scheduler, channelRightQueue);
+                if (channel->scheduled == 0) {
+                    updateAntPositions(channelRightQueue, derPositions);
+                    channel->scheduled = 1;
+                }
             }
             break;
         case 1:
             if (channelLeftQueue->count > 1) {
                 channel->scheduled = scheduleChannel(channel->scheduler, channelLeftQueue);
+                if (channel->scheduled == 0) {
+                    updateAntPositions(channelLeftQueue, izqPositions);
+                    channel->scheduled = 1;
+                }
             }
             break;
+    }
+
+    return;
+}
+
+void updateAntPositions(queue* channelQueue, queue* positions) {
+    queueNode* antNode = (queueNode*) channelQueue->head;
+    queueNode* positionNode = (queueNode*) positions->head;
+
+    ant_t* ant;
+    int position;
+
+    while (antNode != NULL) {
+        ant = (ant_t*) antNode->item;
+        position = (int) (__intptr_t) positionNode->item;
+
+        ant->finalDest = position;
+        ant->reorganizing = 1;
+        ant->waiting = 0;
+
+        antNode = antNode->next;
+        positionNode = positionNode->next;        
     }
 
     return;
@@ -57,8 +88,14 @@ int scheduleChannel(int scheduler, queue* list) {
     return 1;
 }
 
+
+
 char* queueTimes(queue* list) {
-    char *times=malloc(sizeof(char)*20);
+    times=malloc(sizeof(char)*20);
+    if (times == NULL) {
+        printf("Error, no se pudo alocar memoria");
+        exit(EXIT_FAILURE);
+    }
     char time[50];
     queueNode *tmp = list->head;
     ant_t* ant;
@@ -69,12 +106,16 @@ char* queueTimes(queue* list) {
         strcat(times, time);
         tmp = tmp->next;
     }
-    printf("tiempos1: %s\n: ",times);
+    //printf("tiempos1: %s\n: ",times);
     return times;
 }
 
 char* queuePriority(queue* list) {
-    char *priorities=malloc(sizeof(char)*20);
+    priorities=malloc(sizeof(char)*20);
+    if (priorities == NULL) {
+        printf("Error, no se pudo alocar memoria");
+        exit(EXIT_FAILURE);
+    }
     char priority[50];
     queueNode *tmp = list->head;
     ant_t* ant;
@@ -85,7 +126,7 @@ char* queuePriority(queue* list) {
         strcat(priorities, priority);
         tmp = tmp->next;
     }
-    printf("tiempos1: %s\n: ",priorities);
+    //printf("tiempos1: %s\n: ",priorities);
     return priorities;
 }
 
@@ -93,6 +134,7 @@ int prioritySchedule(queue* list) {
     int changes=0;
     char priority_init[50]="";
 	strcat(priority_init,queuePriority(list));
+    free(priorities);
     queueNode* tmp=list->head;
     queueNode* tmp_next;
     queueNode* tmp_prev;
@@ -145,6 +187,7 @@ int prioritySchedule(queue* list) {
     while(swapped);
     char priority_final[50]="";
 	strcat(priority_final,queuePriority(list)); 
+    free(priorities);
     if(strcmp(priority_init,priority_final)==0){
         changes=1;
     }
@@ -155,6 +198,7 @@ int sjfSchedule(queue* list) {
     int changes=0;
     char times_init[50]="";
 	strcat(times_init,queueTimes(list));
+    free(times);
     queueNode* tmp=list->head;
     queueNode* tmp_next;
     queueNode* tmp_prev;
@@ -207,6 +251,7 @@ int sjfSchedule(queue* list) {
     while(swapped);
     char times_final[50]="";
 	strcat(times_final,queueTimes(list)); 
+    free(times);
     if(strcmp(times_init,times_final)==0){
         changes=1;
     }

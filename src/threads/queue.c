@@ -8,6 +8,11 @@ void queueInit(queue* list) {
 
 void queueAddItem(queue* list, queueItem item) {
     queueNode* node = (queueNode*) malloc(sizeof(queueNode));
+    if (node == NULL) {
+        printf("Error, no se pudo alocar memoria");
+        exit(EXIT_FAILURE);
+    }
+    
     node->item = item;
     node->next = NULL;
     node->prev = NULL;

@@ -11,108 +11,95 @@
 #include "logic/antScheduler.h"
 #include "logic/antFlow.h"
 
-/*CEmutex_t mutex;
-
-void* test(void* arg) {
-	printf("hola2\n");
-	CEmutex_lock(&mutex);
-	printf("hola3\n");
-
-	int i = (int) (__intptr_t) arg;
-	i += 1;
-
-	for (int j = 0; j < 1000000000; j++) {
-	//	printf("ah\n");
-	}
-
-	CEmutex_unlock(&mutex);
-	return (void*) (__intptr_t) i;
-}
-
 int main() {
-	CEthread_init();
-	CEmutex_init(&mutex);
+	//srand(time(0));
+	// CEthread_init();
+	// initializeChannels();
+	// clock_gettime(CLOCK_REALTIME, &sign1Begin);
+	// clock_gettime(CLOCK_REALTIME, &sign2Begin);
+	// clock_gettime(CLOCK_REALTIME, &sign3Begin);
 
-	CEthread_t thread1;
-	CEthread_t thread2;
-	void* returnValue1;
-	void* returnValue2;
-	int i = 1;
-	int j = 1;
+	//CEthread_t antMovementThread;
+	//CEthread_create(&antMovementThread, , NULL);
+	//CEthread_detach(antMovementThread);
 
-	printf("%d\n", i);
-	CEthread_create(&thread1, test, (void*) (__intptr_t) i);
-	CEthread_create(&thread2, test, (void*) (__intptr_t) j);
-	//CEthread_detach(thread1);
+	//createAnt(0, 0, 1, channel1->lenght, 4, 23, 1, 2);
+	//scheduleAnts();
+	//createAnt(0, 0, 1, channel1->lenght, 5, 12, 1, 1);
+	//scheduleAnts();
+	//createAnt(0, 0, 1, channel1->lenght, 5, 5, 1, 0);
+	//scheduleAnts();
 
-	printf("hola1\n");
+	//moveAnts();
 
-	for (int j = 0; j < 1000000000; j++) {
-	//	printf("ah\n");
-	}
-
-	CEmutex_lock(&mutex);
-	//CEmutex_unlock(&mutex);
+	//while (1) {
+		//printf("f3\n");
+	//}
+	queue channel1LeftQueue;
+	queueInit(&channel1LeftQueue);
+	ant_t* ant1=(ant_t*)malloc(sizeof(ant_t));
+	ant_t* ant2=(ant_t*)malloc(sizeof(ant_t));
+	ant_t* ant3=(ant_t*)malloc(sizeof(ant_t));
+	ant_t* ant4=(ant_t*)malloc(sizeof(ant_t));
+	ant_t* ant5=(ant_t*)malloc(sizeof(ant_t));
+	ant_t* ant6=(ant_t*)malloc(sizeof(ant_t));
+	ant_t* ant7=(ant_t*)malloc(sizeof(ant_t));
+	ant_t* ant8=(ant_t*)malloc(sizeof(ant_t));
+	ant_t* ant9=(ant_t*)malloc(sizeof(ant_t));
+	ant_t* ant10=(ant_t*)malloc(sizeof(ant_t));
 	
-	CEthread_join(thread1, &returnValue1);
-	printf("%d\n", (int) (__intptr_t) returnValue1);
-	CEthread_join(thread1, &returnValue2);
-	printf("%d\n", (int) (__intptr_t) returnValue2);
-	printf("hola4\n");
+	ant1->priority=2;
+	ant2->priority=3;
+	ant3->priority=11;
+	ant4->priority=1;
+	ant5->priority=15;
+	ant6->priority=4;
+	ant7->priority=8;
+	ant8->priority=10;
+	ant9->priority=9;
+	ant10->priority=6;
 
-	printf("hola5\n");
+	ant1->time=3;
+	ant2->time=3;
+	ant3->time=11;
+	ant4->time=5;
+	ant5->time=20;
+	ant6->time=22;
+	ant7->time=8;
+	ant8->time=10;
+	ant9->time=14;
+	ant10->time=1;
 
-	return 0;
-}*/
-
-void* worker(void* arg) {
-	int i = (int) (__intptr_t) arg;
+	// ant1->priority=15;
+	// ant2->priority=10;
+	// ant3->priority=7;
+	// ant4->priority=8;
+	// ant5->priority=5;
+	// ant6->priority=11;
+	// ant7->priority=2;
+	// ant8->priority=8;
+	// ant9->priority=3;
+	// ant10->priority=9;
+	queueAddItem(&channel1LeftQueue,ant1);
+	queueAddItem(&channel1LeftQueue,ant2);
+	queueAddItem(&channel1LeftQueue,ant3);
+	queueAddItem(&channel1LeftQueue,ant4);
+	queueAddItem(&channel1LeftQueue,ant5);
+	queueAddItem(&channel1LeftQueue,ant6);
+	queueAddItem(&channel1LeftQueue,ant7);
+	queueAddItem(&channel1LeftQueue,ant8);
+	queueAddItem(&channel1LeftQueue,ant9);
+	queueAddItem(&channel1LeftQueue,ant10);
+	printf("Lista tiempo\n");
+	queuePrintTime(&channel1LeftQueue);
+	printf("Lista prioridad\n");
+	queuePrintPriority(&channel1LeftQueue);
+	printf("Ordenada por tiempo\n");
+	sjfSchedule(&channel1LeftQueue);
+	queuePrintTime(&channel1LeftQueue);
+	printf("Ordenada por prioridad\n");
+	prioritySchedule(&channel1LeftQueue);
+	queuePrintPriority(&channel1LeftQueue);
 	
-	while (1) {
-		printf("hola %d\n", i);
-	}
-	
-
-	return NULL;
-}
-
-int main() {
-	srand(time(0));
-	initializeChannels();
-	initializePositions();
-	clock_gettime(CLOCK_REALTIME, &sign1Begin);
-	clock_gettime(CLOCK_REALTIME, &sign2Begin);
-	clock_gettime(CLOCK_REALTIME, &sign3Begin);
-	CEthread_init();
-
-	//createAnt(posX, posY, channelLenght, dest, type, channel, channelTime, priority);
-	/*createAnt(80, 440, channel1->lenght, 1, 0, 1, -1, -1);
-	createAnt(80, 440, channel2->lenght, 1, 0, 2, -1, -1);
-	createAnt(80, 440, channel3->lenght, 1, 0, 3, -1, -1);
-	createAnt(80, 440, channel1->lenght, 1, 0, 1, -1, -1);
-	createAnt(80, 440, channel2->lenght, 1, 0, 2, -1, -1);
-	createAnt(80, 440, channel3->lenght, 1, 0, 3, -1, -1);
-
-	createAnt(1100, 440, channel1->lenght, 0, 0, 1, -1, -1);
-	createAnt(1100, 440, channel2->lenght, 0, 0, 2, -1, -1);
-	createAnt(1100, 440, channel3->lenght, 0, 0, 3, -1, -1);
-	createAnt(1100, 440, channel1->lenght, 0, 0, 1, -1, -1);
-	createAnt(1100, 440, channel2->lenght, 0, 0, 2, -1, -1);
-	createAnt(1100, 440, channel3->lenght, 0, 0, 3, -1, -1);*/
-
-	// CEthread_t threads[7];
-
-	// CEthread_create(&threads[0], &worker, (void*) (__intptr_t) 1);
-	// CEthread_create(&threads[1], &worker, (void*) (__intptr_t) 2);
-	// CEthread_create(&threads[2], &worker, (void*) (__intptr_t) 3);
-	// CEthread_create(&threads[3], &worker, (void*) (__intptr_t) 4);
-	// CEthread_create(&threads[4], &worker, (void*) (__intptr_t) 5);
-	// CEthread_create(&threads[5], &worker, (void*) (__intptr_t) 6);
-	// CEthread_create(&threads[6], &worker, (void*) (__intptr_t) 7);
-
-	while (1) {
-		//printf("hola 0\n");
-	}
-
 	return 0;
 }

@@ -29,6 +29,7 @@ typedef struct {
     int finalDest;
     int trueFinalDest;
     int path;
+    int reorganizing;
     CEthread_t* thread;
 } ant_t;
 

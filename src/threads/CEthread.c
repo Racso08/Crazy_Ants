@@ -15,8 +15,18 @@ void CEthread_init() {
     queueInit(&finishQueue);
 
     cethread_t* mainThread = (cethread_t*) malloc(sizeof(cethread_t));
+    if (mainThread == NULL) {
+        printf("Error, no se pudo alocar memoria");
+        exit(EXIT_FAILURE);
+    }
+
     mainThread->id = threadsIdCount;
     mainThread->context = (ucontext_t*) malloc(sizeof(ucontext_t)); 
+    if (mainThread->context == NULL) {
+        printf("Error, no se pudo alocar memoria");
+        exit(EXIT_FAILURE);
+    }
+
     memset(mainThread->context, '\0', sizeof(ucontext_t));
     mainThread->arg = NULL;
     mainThread->state = RUNNING;
@@ -30,6 +40,11 @@ void CEthread_init() {
     }
 
     queueNode* mainNode = (queueNode*) malloc(sizeof(queueNode));
+    if (mainNode == NULL) {
+        printf("Error, no se pudo alocar memoria");
+        exit(EXIT_FAILURE);
+    }
+
     mainNode->next = NULL;
     mainNode->prev = NULL;
     mainNode->item = mainThread;
@@ -61,12 +76,22 @@ int CEthread_create(CEthread_t* thread, void *(*startFunction)(void *), void *ar
     sigprocmask(SIG_BLOCK, &vtalrm, NULL);
 
     cethread_t* newThread = malloc(sizeof(cethread_t));
+    if (newThread == NULL) {
+        printf("Error, no se pudo alocar memoria");
+        exit(EXIT_FAILURE);
+    }
+
     *thread = threadsIdCount;
     newThread->id = threadsIdCount;
     newThread->state = RUNNING;
     newThread->proc = startFunction;
     newThread->arg = arg;
     newThread->context = (ucontext_t*) malloc(sizeof(ucontext_t));
+    if (newThread->context == NULL) {
+        printf("Error, no se pudo alocar memoria");
+        exit(EXIT_FAILURE);
+    }
+
     newThread->join = 0;
     newThread->detach = 0;
     memset(newThread->context, '\0', sizeof(ucontext_t));
@@ -78,6 +103,11 @@ int CEthread_create(CEthread_t* thread, void *(*startFunction)(void *), void *ar
     }
 
     newThread->context->uc_stack.ss_sp = (char*) malloc(SIGSTKSZ);
+    if (newThread->context->uc_stack.ss_sp == NULL) {
+        printf("Error, no se pudo alocar memoria");
+        exit(EXIT_FAILURE);
+    }
+
     newThread->context->uc_stack.ss_size = SIGSTKSZ;
     newThread->context->uc_stack.ss_flags = 0;
     newThread->context->uc_link = NULL;
