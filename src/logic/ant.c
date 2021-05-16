@@ -491,16 +491,28 @@ int waze(ant_t *ant) {
         }
 
         else if(ant->path == 2){
-            if(ant->posX < ant->finalDest){
-                ant->posX += ant->vel;
+
+            if (ant->reorganizing !=0){
+                if(ant->posX < ant->finalDest){
+                    ant->posX += 1;
+                }
+                else if(ant->posX > ant->finalDest){
+                    ant->posX -= 1;
+                }
+                else{
+                    return 1;
+                }
             }
-            //else if(ant->posX > ant->finalDest){
-            //    ant->posX -= ant->vel;
-            //}
-            else{
-                return 1;
-                //ant->path = 3;
+            else {
+                if(ant->posX < ant->finalDest){
+                    ant->posX += ant->vel;
+                }
+        
+                else{
+                    return 1;
+                }
             }
+
             return 0;
         }
 
@@ -588,15 +600,25 @@ int waze(ant_t *ant) {
         }
 
         else if(ant->path == 2){
-            if(ant->posX > ant->finalDest){
-                ant->posX -= ant->vel;
+            if (ant->reorganizing !=0){
+                if(ant->posX < ant->finalDest){
+                    ant->posX += 1;
+                }
+                else if(ant->posX > ant->finalDest){
+                    ant->posX -= 1;
+                }
+                else{
+                    return 1;
+                }
             }
-            //else if(ant->posX > ant->finalDest){
-            //    ant->posX -= ant->vel;
-            //}
-            else{
-                //ant->path = 3;
-                return 1;
+            else {
+                if(ant->posX < ant->finalDest){
+                    ant->posX -= ant->vel;
+                }
+        
+                else{
+                    return 1;
+                }
             }
             return 0;
         }
