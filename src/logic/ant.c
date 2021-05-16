@@ -94,7 +94,7 @@ int createAnt(int type, int channel, int dest, int extra) {
                 channelTime = -1;
             }else if(channel1->scheduler == 2 || channel1->scheduler == 4){
                 if (extra <= 24) {
-                    printf("Por favor ingrese el tiempo de la hormiga\n");
+                    printf("Por favor ingrese el tiempo de la hormiga o aumentelo\n");
                     return 0;
                 }
                 channelTime = extra;
@@ -117,7 +117,7 @@ int createAnt(int type, int channel, int dest, int extra) {
                 channelTime = -1;
             }else if(channel2->scheduler == 2 || channel2->scheduler == 4){
                 if (extra <= 24) {
-                    printf("Por favor ingrese el tiempo de la hormiga\n");
+                    printf("Por favor ingrese el tiempo de la hormiga o aumentelo\n");
                     return 0;
                 }
                 channelTime = extra;
@@ -141,7 +141,7 @@ int createAnt(int type, int channel, int dest, int extra) {
                 channelTime = -1;
             }else if(channel3->scheduler == 2 || channel3->scheduler == 4){
                 if (extra <= 24) {
-                    printf("Por favor ingrese el tiempo de la hormiga\n");
+                    printf("Por favor ingrese el tiempo de la hormiga o aumentelo\n");
                     return 0;
                 }
                 channelTime = extra;
@@ -612,7 +612,7 @@ int waze(ant_t *ant) {
                 }
             }
             else {
-                if(ant->posX < ant->finalDest){
+                if(ant->posX > ant->finalDest){
                     ant->posX -= ant->vel;
                 }
         
