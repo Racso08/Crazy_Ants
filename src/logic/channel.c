@@ -45,6 +45,10 @@ void initializeChannels() {
     queueInit(&currentChannel2Ants);
     queueInit(&currentChannel3Ants);
 
+    queueInit(&currentChannel1ActiveAnt);
+    queueInit(&currentChannel2ActiveAnt);
+    queueInit(&currentChannel3ActiveAnt);
+
     queueInit(&channel1LeftEndQueue);
     queueInit(&channel1RightEndQueue);
     queueInit(&channel2LeftEndQueue);
@@ -101,6 +105,7 @@ void initializeChannelsAux(FILE* fp, int id) {
 
     channel->currentW = 0;
     channel->sign = 0;
+    channel->previousAntSign = 0;
     channel->scheduled = 1;
 
     if (id == 1) {

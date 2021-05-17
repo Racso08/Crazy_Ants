@@ -215,6 +215,7 @@ int createAntAux(int posX, int posY, int vel, int channelLenght, int dest, int t
     ant->trueFinalDest = getTrueFinalDestination(channel, dest);
     ant->path = 0;
     ant->reorganizing = 0;
+    ant->disappear = 0;
     ant->thread = &(thread[currentAntAmount]);
 
     CEthread_create(&(thread[currentAntAmount]), startAnt, (void*) ant);
@@ -395,33 +396,24 @@ void* startAnt(void* arg) {
         CEthread_yield();
     }
 
-   // ant->waiting = 1;
-
-  //  printf("Soy la hormiga %d y estoy esperando a cruzar el canal %d\n", id, channel);
-
-  /*  while (1) {
-        if (ant->inChannel == 1) {
-            ant->waiting = 0;
-            break;
-        }
-        CEthread_yield();
-    }*/
-
     printf("Soy la hormiga %d y estoy cruzando el canal %d\n", id, channel);
 
     while (1) {
-        ant->currentChannelPosition += ant->vel;
-        if (ant->dest == 0) {
-            ant->posX -= ant->vel;
-        }
-        else {
-            ant->posX += ant->vel;
+        if (ant->disappear == 0) {
+            ant->currentChannelPosition += ant->vel;
+            if (ant->dest == 0) {
+                ant->posX -= ant->vel;
+            }
+            else {
+                ant->posX += ant->vel;
+            }
+            
+            if (ant->currentChannelPosition >= ant->channelLenght) {
+                ant->inChannel = 0;
+                break;
+            }
         }
         
-        if (ant->currentChannelPosition >= ant->channelLenght) {
-            ant->inChannel = 0;
-            break;
-        }
         CEthread_yield();
     }
 

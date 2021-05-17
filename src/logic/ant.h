@@ -30,6 +30,7 @@ typedef struct {
     int trueFinalDest;
     int path;
     int reorganizing;
+    int disappear;
     CEthread_t* thread;
 } ant_t;
 

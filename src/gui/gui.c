@@ -197,42 +197,44 @@ int main(int argc, char **argv)
             while(temp != NULL){
                 ant = (ant_t*)temp->item;
 
-                if(ant->dest == 1){
-                    if(ant->type == 0){
-                        SDL_Rect spriteNormal = {(sprite % 5)*24,0,24,38};
-                        SDL_Rect normalRect = {ant->posX,ant->posY,24,38}; 
-                        SDL_RenderCopyEx(renderer,normalTXTIzq,&spriteNormal,&normalRect,0,NULL,0);
-                    }
+                if (ant->disappear == 0) {
+                    if(ant->dest == 1){
+                        if(ant->type == 0){
+                            SDL_Rect spriteNormal = {(sprite % 5)*24,0,24,38};
+                            SDL_Rect normalRect = {ant->posX,ant->posY,24,38}; 
+                            SDL_RenderCopyEx(renderer,normalTXTIzq,&spriteNormal,&normalRect,0,NULL,0);
+                        }
 
-                    if(ant->type == 1){
-                        SDL_Rect spriteNormal = {(sprite % 3)*32,0,32,39};
-                        SDL_Rect normalRect = {ant->posX,ant->posY,32,39}; 
-                        SDL_RenderCopyEx(renderer,zompopaTXTIzq,&spriteNormal,&normalRect,0,NULL,0);
-                    }
+                        if(ant->type == 1){
+                            SDL_Rect spriteNormal = {(sprite % 3)*32,0,32,39};
+                            SDL_Rect normalRect = {ant->posX,ant->posY,32,39}; 
+                            SDL_RenderCopyEx(renderer,zompopaTXTIzq,&spriteNormal,&normalRect,0,NULL,0);
+                        }
 
-                    if(ant->type == 2){
-                        SDL_Rect spriteNormal = {(sprite % 4)*14,0,14,38};
-                        SDL_Rect normalRect = {ant->posX,ant->posY,14,38};
-                        SDL_RenderCopyEx(renderer,reinaTXTIzq,&spriteNormal,&normalRect,0,NULL,0);
+                        if(ant->type == 2){
+                            SDL_Rect spriteNormal = {(sprite % 4)*14,0,14,38};
+                            SDL_Rect normalRect = {ant->posX,ant->posY,14,38};
+                            SDL_RenderCopyEx(renderer,reinaTXTIzq,&spriteNormal,&normalRect,0,NULL,0);
+                        }
                     }
-                }
-                else{
-                    if(ant->type == 0){
-                        SDL_Rect spriteNormal = {(sprite % 5)*24,0,24,38};
-                        SDL_Rect normalRect = {ant->posX,ant->posY,24,38};
-                        SDL_RenderCopyEx(renderer,normalTXT,&spriteNormal,&normalRect,0,NULL,0);
-                    }
+                    else{
+                        if(ant->type == 0){
+                            SDL_Rect spriteNormal = {(sprite % 5)*24,0,24,38};
+                            SDL_Rect normalRect = {ant->posX,ant->posY,24,38};
+                            SDL_RenderCopyEx(renderer,normalTXT,&spriteNormal,&normalRect,0,NULL,0);
+                        }
 
-                    if(ant->type == 1){
-                        SDL_Rect spriteNormal = {(sprite % 3)*32,0,32,39};
-                        SDL_Rect normalRect = {ant->posX,ant->posY,32,39}; 
-                        SDL_RenderCopyEx(renderer,zompopaTXT,&spriteNormal,&normalRect,0,NULL,0);
-                    }
+                        if(ant->type == 1){
+                            SDL_Rect spriteNormal = {(sprite % 3)*32,0,32,39};
+                            SDL_Rect normalRect = {ant->posX,ant->posY,32,39}; 
+                            SDL_RenderCopyEx(renderer,zompopaTXT,&spriteNormal,&normalRect,0,NULL,0);
+                        }
 
-                    if(ant->type == 2){
-                        SDL_Rect spriteNormal = {(sprite % 4)*14,0,14,38};
-                        SDL_Rect normalRect = {ant->posX,ant->posY,14,38}; 
-                        SDL_RenderCopyEx(renderer,reinaTXT,&spriteNormal,&normalRect,0,NULL,0);
+                        if(ant->type == 2){
+                            SDL_Rect spriteNormal = {(sprite % 4)*14,0,14,38};
+                            SDL_Rect normalRect = {ant->posX,ant->posY,14,38}; 
+                            SDL_RenderCopyEx(renderer,reinaTXT,&spriteNormal,&normalRect,0,NULL,0);
+                        }
                     }
                 }
                 
