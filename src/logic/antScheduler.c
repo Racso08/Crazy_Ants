@@ -10,6 +10,10 @@ char* queuePriority(queue* list);
 int prioritySchedule(queue* list);
 int sjfSchedule(queue* list);
 
+/**
+ * Funcion encargada de calendarizar las hormigas
+ * Recibe el canal y el destino de la hormiga
+ */
 void scheduleAnts(int channel, int dest) {
     switch (channel) {
         case 1:
@@ -28,6 +32,10 @@ void scheduleAnts(int channel, int dest) {
     return;
 }
 
+/**
+ * Funcion auxiliar encargada de calendarizar las hormigas
+ * Recibe el canala, la lista de espera izquierda y derecha del canal, el destino de la hormiga y las listas de posiciones izquierdas y derechas del canal
+ */
 void scheduleAntsAux(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueue, int dest, queue* izqPositions, queue* derPositions) {
     switch (dest) {
         case 0:
@@ -53,6 +61,10 @@ void scheduleAntsAux(channel_t* channel, queue* channelLeftQueue, queue* channel
     return;
 }
 
+/**
+ * Funcion encargada de actualizar las posiciones de las hormigas
+ * Recibe la lista de hormiga y las posiciones a colocar
+ */
 void updateAntPositions(queue* channelQueue, queue* positions) {
     queueNode* antNode = (queueNode*) channelQueue->head;
     queueNode* positionNode = (queueNode*) positions->head;
@@ -75,6 +87,10 @@ void updateAntPositions(queue* channelQueue, queue* positions) {
     return;
 }
 
+/**
+ * Funcion encargada de calendarizar las hormigas en espera de un canal
+ * Recibe el tipo de calendarizador y la lista a analizar
+ */
 int scheduleChannel(int scheduler, queue* list) {
     switch (scheduler) {
         case 1:
@@ -88,8 +104,11 @@ int scheduleChannel(int scheduler, queue* list) {
     return 1;
 }
 
-
-
+/**
+ * Funcion encargada de obtener los tiempos de las hormigas y colocarlos en una lista de caracteres
+ * Recibe la lista a analizar
+ * Retorna el puntero a esa lista
+ */
 char* queueTimes(queue* list) {
     times=malloc(sizeof(char)*20);
     if (times == NULL) {
@@ -110,6 +129,11 @@ char* queueTimes(queue* list) {
     return times;
 }
 
+/**
+ * Funcion encargada de obtener las prioridades de las hormigas y colocarlos en una lista de caracteres
+ * Recibe la lista a analizar
+ * Retorna el puntero a esa lista
+ */
 char* queuePriority(queue* list) {
     priorities=malloc(sizeof(char)*20);
     if (priorities == NULL) {
@@ -130,6 +154,11 @@ char* queuePriority(queue* list) {
     return priorities;
 }
 
+/**
+ * Funcion encargada de ordenar la lista por prioridad de las hormigas
+ * Recibe la lista a ordenar
+ * Retorna 0 en caso de cambios, 1 en caso de que no
+ */
 int prioritySchedule(queue* list) {
     int changes=0;
     char priority_init[50]="";
@@ -194,6 +223,11 @@ int prioritySchedule(queue* list) {
     return changes;  
 }
 
+/**
+ * Funcion encargada de ordenar la lista por tiempos de las hormigas
+ * Recibe la lista a ordenar
+ * Retorna 0 en caso de cambios, 1 en caso de que no
+ */
 int sjfSchedule(queue* list) {
     int changes=0;
     char times_init[50]="";
@@ -258,6 +292,10 @@ int sjfSchedule(queue* list) {
     return changes;    
 }
 
+/**
+ * Funcion encargada de imprimir las prioridad de las hormigas
+ * Recibe la lista de hormigas
+ */
 void queuePrintPriority(queue* list){
     queueNode *tmp = list->head;
     ant_t* ant;
@@ -269,6 +307,10 @@ void queuePrintPriority(queue* list){
     }
 }
 
+/**
+ * Funcion encargada de imprimir los tiempos de las hormigas
+ * Recibe la lista de hormigas
+ */
 void queuePrintTime(queue* list){
     queueNode *tmp = list->head;
     ant_t* ant;

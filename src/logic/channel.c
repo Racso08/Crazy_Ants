@@ -6,6 +6,9 @@ void initializeChannelsAux(FILE* fp, int id);
 int getScheduler(char* data);
 int getFlow(char* data);
 
+/**
+ * Funcion encargada de inicializar los canales con los datos leido del archivo de configuracion
+ */
 void initializeChannels() {
     FILE* fp = fopen(configFile, "r");
     char line[100];
@@ -61,6 +64,10 @@ void initializeChannels() {
     return;
 }
 
+/**
+ * Funcion auxiliar encargada de inicializar los canales con los datos leido del archivo de configuracion
+ * Recibe el punter del archivo y el id del canal
+ */
 void initializeChannelsAux(FILE* fp, int id) {
     channel_t* channel = (channel_t*) malloc(sizeof(channel_t));
     if (channel == NULL) {
@@ -124,6 +131,11 @@ void initializeChannelsAux(FILE* fp, int id) {
     return;
 }
 
+/**
+ * Funcion encargada de obtener el calendarizador correspondiente del archivo de texto
+ * Recibe la cadena a comparar
+ * Retorna el valor correspondiente del calendarizador
+ */
 int getScheduler(char* data) {
     data[strcspn(data, "\n")] = 0;
     if (strcmp(data, "RoundRobin") == 0) {
@@ -143,6 +155,11 @@ int getScheduler(char* data) {
     }
 }
 
+/**
+ * Funcion encargada de obtener el flujo del canal correspondiente del archivo de texto
+ * Recibe la cadena a comparar
+ * Retorna el valor correspondiente del control de flujo
+ */
 int getFlow(char* data) {
     data[strcspn(data, "\n")] = 0;
     if (strcmp(data, "Equidad") == 0) {

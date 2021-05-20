@@ -1,11 +1,19 @@
 #include "queue.h"
 
+/**
+ * Funcion encargada de inicializar las listas enlazadas
+ * Recibe la lista enlazada a inicializar
+ */
 void queueInit(queue* list) {
     list->head = NULL;
     list->count = 0; 
     return;
 };
 
+/**
+ * Funcion encargada de agregar un objeto a una lista enlazada
+ * Recibe la lista enlazada a la que se le agregara el objeto y el objeto a agregar
+ */
 void queueAddItem(queue* list, queueItem item) {
     queueNode* node = (queueNode*) malloc(sizeof(queueNode));
     if (node == NULL) {
@@ -36,6 +44,10 @@ void queueAddItem(queue* list, queueItem item) {
     }
 }
 
+/**
+ * Funcion encargada de agregar un nodo a una lista enlazada
+ * Recibe la lista enlazada a agregar el nodo y el nodo a agregar
+ */
 void queueAddNode(queue* list, queueNode* node) {
     node->next = NULL;
 
@@ -56,6 +68,11 @@ void queueAddNode(queue* list, queueNode* node) {
     }
 }
 
+/**
+ * Funcion encargada de retornar el primer elemento de una lista enlazada
+ * Recibe la lista enlazada a tratar
+ * Retorna el primer objeto de la lista enlazada
+ */
 queueItem queueGetFirstItem(queue* list) {
     if(list->head == NULL){
         fprintf(stderr, "Error, no hay elementos en la lista\n");
@@ -77,6 +94,11 @@ queueItem queueGetFirstItem(queue* list) {
     return item;
 }
 
+/**
+ * Funcion encargada de obtener el primer nodo de una lista enlazada
+ * Recibe la lista enlazada a tratar
+ * Retorna el primer nodo de la lista enlazada
+ */
 queueNode* queueGetFirstNode(queue* list) {
     if(list->head == NULL){
         fprintf(stderr, "Error, no hay elementos en la lista\n");
@@ -96,6 +118,10 @@ queueNode* queueGetFirstNode(queue* list) {
     return tmp;
 }
 
+/**
+ * Funcion encargada de limpiar una lista enlazada
+ * Recibe la lista enlazada a limpiar
+ */
 void queueDestroy(queue* list) {
     while(list->count != 0) {
         queueGetFirstItem(list);

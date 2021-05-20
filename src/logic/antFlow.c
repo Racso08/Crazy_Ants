@@ -11,7 +11,7 @@ void tico(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueue,
 int schedulerHandler(channel_t* channel, queue* channelQueue, queue* currentChannelAnts, queue* channelEndQueue, queue* positions, queue* currentChannelActiveAnt, long* antQuantumBegin);
 
 int roundRobin(channel_t* channel, queue* channelQueue, queue* currentChannelAnts, queue* channelEndQueue, queue* positions, queue* currentChannelActiveAnt, long* antQuantumBegin);
-int PR__SJF_FCFS_RT(channel_t* channel, queue* channelQueue, queue* currentChannelAnts, queue* channelEndQueue, queue* positions);
+int PR_SJF_FCFS_RT(channel_t* channel, queue* channelQueue, queue* currentChannelAnts, queue* channelEndQueue, queue* positions);
 
 void advanceAnts(queue* channelQueue, queue* positions);
 
@@ -20,11 +20,9 @@ long ant2QuantumBegin = 0;
 long ant3QuantumBegin = 0;
 int initialize = 0;
 
-void initializeCurrentAnt(ant_t* currentChannelAnt) {
-    currentChannelAnt = NULL;
-    return;
-}
-
+/**
+ * Funcion encargada de mover las hormigas y todo lo que involucre el manejo de estas
+ */
 void moveAnts() {
     checkIfAntArrived(&channel1LeftEndQueue);
     checkIfAntArrived(&channel1RightEndQueue);
@@ -58,6 +56,10 @@ void moveAnts() {
     return;
 }
 
+/**
+ * Funcion encargada de indicar la posicion de la siguiente hormiga a la hormiga anterior
+ * Recibe la lista de hormigas
+ */
 void setNextAntsPositions(queue* list) {
     int n = list->count;
     if (n > 0) {
@@ -87,6 +89,10 @@ void setNextAntsPositions(queue* list) {
     return;
 }
 
+/**
+ * Funcion encargada de verificar si una hormiga llego al otro hormiguero
+ * Recibe la lista de hormigas
+ */
 void checkIfAntArrived(queue* list) {
     if (list->count > 0) {
         queueNode* node = (queueNode*) list->head;
@@ -102,6 +108,10 @@ void checkIfAntArrived(queue* list) {
     return;
 }
 
+/**
+ * Funcion encargada de manejar el flujo de hormigas de un canal
+ * Recibe el canal, la cola de listos tanto izquierda y derecha del canal,las hormigas actuales del canal, las hormigas que cruzaron el canal tanto izquierda como derecha, las posiciones de las hormigas izquierda y derecha del canal, el tiempo de inicio del letrero, el cronometro del letrero, las hormiga activa en el canal y el inicio del quantum de la hormiga
+ */
 void manageFlow(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueue, queue* currentChannelAnts, queue* channelLeftEndQueue, queue* channelRightEndQueue, queue* izqPositions, queue* derPositions, long* signBegin, struct timespec channelTimer, queue* currentChannelActiveAnt, long* antQuantumBegin) {
     switch (channel->flow) {
         case 0:
@@ -118,6 +128,10 @@ void manageFlow(channel_t* channel, queue* channelLeftQueue, queue* channelRight
     return;
 }
 
+/**
+ * Funcion encargada de manejar el flujo de hormigas de equidad de un canal
+ * Recibe el canal, la cola de listos tanto izquierda y derecha del canal,las hormigas actuales del canal, las hormigas que cruzaron el canal tanto izquierda como derecha, las posiciones de las hormigas izquierda y derecha del canal, las hormiga activa en el canal y el inicio del quantum de la hormiga
+ */
 void equity(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueue, queue* currentChannelAnts, queue* channelLeftEndQueue, queue* channelRightEndQueue, queue* izqPositions, queue* derPositions, queue* currentChannelActiveAnt, long* antQuantumBegin) {
     int success = 0;
 
@@ -153,6 +167,10 @@ void equity(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueu
     return;
 }
 
+/**
+ * Funcion encargada de manejar el flujo de hormigas de letrero de un canal
+ * Recibe el canal, la cola de listos tanto izquierda y derecha del canal,las hormigas actuales del canal, las hormigas que cruzaron el canal tanto izquierda como derecha, las posiciones de las hormigas izquierda y derecha del canal, el tiempo de inicio del letrero, el cronometro del letrero, las hormiga activa en el canal y el inicio del quantum de la hormiga
+ */
 void sign(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueue, queue* currentChannelAnts, queue* channelLeftEndQueue, queue* channelRightEndQueue, queue* izqPositions, queue* derPositions, long* signBegin, struct timespec channelTimer, queue* currentChannelActiveAnt, long* antQuantumBegin) {
     clock_gettime(CLOCK_REALTIME, &channelTimer);
     long elapsedSignTime = channelTimer.tv_sec - *signBegin;
@@ -175,6 +193,10 @@ void sign(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueue,
     return;
 }
 
+/**
+ * Funcion encargada de manejar el flujo de hormigas tico de un canal
+ * Recibe el canal, la cola de listos tanto izquierda y derecha del canal,las hormigas actuales del canal, las hormigas que cruzaron el canal tanto izquierda como derecha, las posiciones de las hormigas izquierda y derecha del canal, las hormiga activa en el canal y el inicio del quantum de la hormiga
+ */
 void tico(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueue, queue* currentChannelAnts, queue* channelLeftEndQueue, queue* channelRightEndQueue, queue* izqPositions, queue* derPositions, queue* currentChannelActiveAnt, long* antQuantumBegin) {
     if (channelLeftQueue->count == 0 && channelRightQueue->count > 0) {
         channel->sign = 1;
@@ -201,28 +223,36 @@ void tico(channel_t* channel, queue* channelLeftQueue, queue* channelRightQueue,
     return;
 }
 
+/**
+ * Funcion encargada de manejar el calendarizador del canal
+ * Recibe el canal, la cola de listos del canal,las hormigas actuales del canal, las hormigas que cruzaron el canal, las posiciones de las hormigas, las hormiga activa en el canal y el inicio del quantum de la hormiga
+ */
 int schedulerHandler(channel_t* channel, queue* channelQueue, queue* currentChannelAnts, queue* channelEndQueue, queue* positions, queue* currentChannelActiveAnt, long* antQuantumBegin) {
     switch (channel->scheduler) {
         case 0:
             return roundRobin(channel, channelQueue, currentChannelAnts, channelEndQueue, positions, currentChannelActiveAnt, antQuantumBegin);
             break;
         case 1:
-            return PR__SJF_FCFS_RT(channel, channelQueue, currentChannelAnts, channelEndQueue, positions);
+            return PR_SJF_FCFS_RT(channel, channelQueue, currentChannelAnts, channelEndQueue, positions);
             break;
         case 2:
-            return PR__SJF_FCFS_RT(channel, channelQueue, currentChannelAnts, channelEndQueue, positions);
+            return PR_SJF_FCFS_RT(channel, channelQueue, currentChannelAnts, channelEndQueue, positions);
             break;
         case 3:
-            return PR__SJF_FCFS_RT(channel, channelQueue, currentChannelAnts, channelEndQueue, positions);
+            return PR_SJF_FCFS_RT(channel, channelQueue, currentChannelAnts, channelEndQueue, positions);
             break;
         case 4:
-            return PR__SJF_FCFS_RT(channel, channelQueue, currentChannelAnts, channelEndQueue, positions);
+            return PR_SJF_FCFS_RT(channel, channelQueue, currentChannelAnts, channelEndQueue, positions);
             break;
     }
 
     return 0;
 }
 
+/**
+ * Funcion encargada de manejar el calendarizador Round Robin del canal
+ * Recibe el canal, la cola de listos del canal,las hormigas actuales del canal, las hormigas que cruzaron el canal, las posiciones de las hormigas, las hormiga activa en el canal y el inicio del quantum de la hormiga
+ */
 int roundRobin(channel_t* channel, queue* channelQueue, queue* currentChannelAnts, queue* channelEndQueue, queue* positions, queue* currentChannelActiveAnt, long* antQuantumBegin) {
     int added = 0;
 
@@ -279,7 +309,11 @@ int roundRobin(channel_t* channel, queue* channelQueue, queue* currentChannelAnt
     return added;
 }
 
-int PR__SJF_FCFS_RT(channel_t* channel, queue* channelQueue, queue* currentChannelAnts, queue* channelEndQueue, queue* positions) {
+/**
+ * Funcion encargada de manejar los calendarizadores, Prioridad, Shortest Job First, First Come First Serve y Tiempo Real del canal
+ * Recibe el canal, la cola de listos del canal,las hormigas actuales del canal, las hormigas que cruzaron el canal y las posiciones de las hormigas
+ */
+int PR_SJF_FCFS_RT(channel_t* channel, queue* channelQueue, queue* currentChannelAnts, queue* channelEndQueue, queue* positions) {
     if (currentChannelAnts->count > 0) {
         ant_t* currentAnt = (ant_t*) currentChannelAnts->head->item;
         if (currentAnt->inChannel == 1) {
@@ -313,6 +347,10 @@ int PR__SJF_FCFS_RT(channel_t* channel, queue* channelQueue, queue* currentChann
     return 0;
 }
 
+/**
+ * Funcion encargada de mover las hormigas un espacio hacia adelante
+ * Recibe la lista de hormigas y sus posiciones
+ */
 void advanceAnts(queue* channelQueue, queue* positions) {
     queueNode* antNode = (queueNode*) channelQueue->head;
     queueNode* positionNode = (queueNode*) positions->head;

@@ -21,6 +21,10 @@ static const int width = 1200;
 static const int height = 700;
 char input[50] = "";
 
+/**
+ * Funcion principal del programa
+ * Se encuentra el ciclo principal de la interfaz grafica
+ */
 int main(int argc, char **argv)
 {
     srand(time(0));
@@ -314,6 +318,10 @@ int main(int argc, char **argv)
     return 0;
 }
 
+/**
+ * Funcion encargada de inicializar una textura de un archivo
+ * Recibe el nombre del archivo y el renderizador
+ */
 SDL_Texture *initialize_texture_from_file(const char* file_name, SDL_Renderer *renderer) {
     SDL_Surface *image = IMG_Load(file_name);
     SDL_Texture * image_texture = SDL_CreateTextureFromSurface(renderer, image);

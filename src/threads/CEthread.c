@@ -7,6 +7,10 @@ void start(void* (*startFunction)(void*), void* args);
 cethread_t* findThread(CEthread_t thread);
 void scheduler(int signal);
 
+/**
+ * Funcion encargada de inicializar la biblioteca de hilos
+ * Crea el contexto principal del programa y la alarma que se encarga de activar el calendarizador
+ */
 void CEthread_init() {
 	struct sigaction act;
 
@@ -72,6 +76,11 @@ void CEthread_init() {
     }
 }
 
+/**
+ * Funcion encargada de crear un hilo
+ * Recibe el hilo a crear, la funcion que ejecutara el hilo y los argumentos de dicha funcion
+ * Retorna 0 en caso de exito
+ */
 int CEthread_create(CEthread_t* thread, void *(*startFunction)(void *), void *arg) {
     sigprocmask(SIG_BLOCK, &vtalrm, NULL);
 
@@ -119,6 +128,10 @@ int CEthread_create(CEthread_t* thread, void *(*startFunction)(void *), void *ar
     return 0; 
 }
 
+/**
+ * Funcion encargada de finalizar un hilo
+ * Recibe el valor a retornar por el hilo
+ */
 void CEthread_end(void* returnValue) {
     sigprocmask(SIG_BLOCK, &vtalrm, NULL);
 
@@ -171,6 +184,10 @@ void CEthread_end(void* returnValue) {
     setcontext(currentThread->context);
 }
 
+/**
+ * Function encargada de detener la ejecucion de un hilo y brindarle el tiempo de ejecucion al siguiente hilo en la cola
+ * Retorna 0 en caso de exito
+ */
 int CEthread_yield(void) {
     sigprocmask(SIG_BLOCK, &vtalrm, NULL);
     
@@ -193,6 +210,11 @@ int CEthread_yield(void) {
     return 0; 
 }
 
+/**
+ * Funcion encargada de retornar el valor obtenido por un hilo a otro
+ * Recibe el hilo del que se espera el valor y el valor retornado
+ * Retorna 0 en caso de exito
+ */
 int CEthread_join(CEthread_t thread, void **returnValue) {
 
     cethread_t* currentThread = (cethread_t*) currentNode->item;
@@ -215,7 +237,7 @@ int CEthread_join(CEthread_t thread, void **returnValue) {
     }
 
     if (trueThread->detach == 1) {
-        printf("Error, no se puede hacer un join de un hilo detached\n");
+        printf("Error, no se puede hacer un join de un hilo despegado\n");
         return -1;
     }
 
@@ -238,6 +260,11 @@ int CEthread_join(CEthread_t thread, void **returnValue) {
     return 0;
 }
 
+/**
+ * Funcion encargada de despegar un hilo
+ * Esto quiere decir que cuando termine su ejecucion se liberan sus recursos
+ * Retorna 0 en caso de exito
+ */
 int CEthread_detach(CEthread_t thread) {
     cethread_t* trueThread = findThread(thread);
 
@@ -256,6 +283,10 @@ int CEthread_detach(CEthread_t thread) {
     return 0;
 }
 
+/**
+ * Funcion encargada de inicializar un mutex
+ * Retorna 0 en caso de exito
+ */
 int CEmutex_init(CEmutex_t* mutex) {
     sigprocmask(SIG_BLOCK, &vtalrm, NULL);  
     queueInit(mutex);
@@ -263,6 +294,10 @@ int CEmutex_init(CEmutex_t* mutex) {
     return 0;
 }
 
+/**
+ * Funcion encargada de destruir un mutex
+ * Retorna 0 en caso de exito
+ */
 int CEmutex_destroy(CEmutex_t* mutex) {
     sigprocmask(SIG_BLOCK, &vtalrm, NULL); 
     queueDestroy(mutex);
@@ -270,6 +305,10 @@ int CEmutex_destroy(CEmutex_t* mutex) {
     return 0; 
 }
 
+/**
+ * Funcion encargada de liberar un mutex
+ * Retorna 0 en caso de exito
+ */
 int CEmutex_unlock(CEmutex_t* mutex) {
     sigprocmask(SIG_BLOCK, &vtalrm, NULL);
 
@@ -290,6 +329,10 @@ int CEmutex_unlock(CEmutex_t* mutex) {
     return 0; 
 }
 
+/**
+ * Funcion encargada de bloquear un mutex
+ * Retorna 0 en caso de exito
+ */
 int CEmutex_trylock(CEmutex_t* mutex) {
     sigprocmask(SIG_BLOCK, &vtalrm, NULL); 
 
@@ -316,6 +359,9 @@ int CEmutex_trylock(CEmutex_t* mutex) {
     return 0; 
 }
 
+/**
+ * Funcion encargada de iniciar un hilo
+ */
 void start(void* (*startFunction)(void*), void* args) {
     sigprocmask(SIG_UNBLOCK, &vtalrm, NULL);
 
@@ -326,6 +372,9 @@ void start(void* (*startFunction)(void*), void* args) {
     CEthread_end(currentThread->returnValue);
 }
 
+/**
+ * Funcion encargada de buscar un hilo en las colas de listo y finalizado
+ */
 cethread_t* findThread(CEthread_t thread) {
     queueNode* tmp = readyQueue.head;   
     cethread_t* itemThread;
@@ -349,6 +398,10 @@ cethread_t* findThread(CEthread_t thread) {
     return NULL;
 }
 
+/**
+ * Funcion encargada de calendarizar los hilos
+ * Aplica los cambios de contexto
+ */
 void scheduler(int signal) {
     sigprocmask(SIG_BLOCK, &vtalrm, NULL);
 
@@ -357,7 +410,16 @@ void scheduler(int signal) {
     }
 
     queueNode* nextNode = queueGetFirstNode(&readyQueue);
+    if (nextNode == NULL) {
+        printf("Se ha producido un error, finalizando");
+        exit(EXIT_FAILURE);
+    }
+
     cethread_t* nextThread = (cethread_t*) nextNode->item;
+    if (nextThread == NULL) {
+        printf("Se ha producido un error, finalizando");
+        exit(EXIT_FAILURE);
+    }
 
     queueNode* previousNode = currentNode;
     cethread_t* previousThread = (cethread_t*) previousNode->item;

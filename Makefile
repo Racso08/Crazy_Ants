@@ -30,5 +30,11 @@ CEthread.o: src/threads/CEthread.c src/threads/CEthread.h
 queue.o: src/threads/queue.c src/threads/queue.h
 	gcc -c src/threads/queue.c
 
+install:
+	sudo apt install libsdl1.2-dev
+	sudo apt-get install libsdl2-2.0
+	sudo apt-get install libsdl2-dev
+	sudo apt install libsdl2-image-dev
+
 clean:
 	rm *.o

@@ -11,6 +11,9 @@ int waze(ant_t *ant);
 int currentAntAmount = 0;
 CEthread_t thread[MAXANTS];
 
+/**
+ * Funcion encargada de inicializar las posiciones de las hormigas
+ */
 void initializePositions() {
     queueInit(&izq1);
     queueInit(&izq2);
@@ -60,7 +63,17 @@ void initializePositions() {
     return;
 }
 
+/**
+ * Funcion encargada de crear una hormiga
+ * Recibe el tipo de hormiga, el canal de la hormiga, el destino de esta y un parametro extra
+ * Retorna 1 en caso de exito, 0 en caso de fallo
+ */
 int createAnt(int type, int channel, int dest, int extra) {
+    if (allAnts.count > 10) {
+        printf("Se ha alcanzado el limite maximo de hormigas en pantalla, por favor espere a que alguna termine\n");
+        return 0;
+    }
+
     int posX;
     int posY;
     int channelLenght;
@@ -180,6 +193,11 @@ int createAnt(int type, int channel, int dest, int extra) {
     return createAntAux(posX, posY, vel, channelTrueLenght, dest, type, channel, channelTime, priority);
 }
 
+/**
+ * Funcion auxiliar encargada de crear una hormiga
+ * Recibe las posiciones x y y de la hormiga, la velocidad de esta, el largo del canal, el destino de la hormiga, el tipo de esta, el canal de esta, el tiempo en cruzar este canal y la prioridad
+ * Retorna 1 en caso de exito, 0 en caso de fallo
+ */
 int createAntAux(int posX, int posY, int vel, int channelLenght, int dest, int type, int channel, int time, int priority) {
     int finalDest = checkIfIsPossibleToAddAnt(channel, dest);
     if (finalDest < 0) {
@@ -229,6 +247,11 @@ int createAntAux(int posX, int posY, int vel, int channelLenght, int dest, int t
     return 1;
 }
 
+/**
+ * Funcion encargada de verificar si se puede agregar una hormiga
+ * Recibe el canal y el destino de la hormiga
+ * Retorna 1 en caso de exito, 0 lo contrario
+ */
 int checkIfIsPossibleToAddAnt(int channel, int dest) {
     switch (channel) {
         case 1:
@@ -278,6 +301,11 @@ int checkIfIsPossibleToAddAnt(int channel, int dest) {
     return -1;
 }
 
+/**
+ * Funcion encargada de obtener el verdadero destino final de la hormiga
+ * Recibe el canal y el destino de esta
+ * Retorna el verdadero destino final
+ */
 int getTrueFinalDestination(int channel, int dest) {
     switch (channel) {
         case 1:
@@ -315,6 +343,10 @@ int getTrueFinalDestination(int channel, int dest) {
     return -1;
 }
 
+/**
+ * Funcion encargada de obtener la hormiga en una posicion de una lista enlazada
+ * Recibe la lista enlazada y la posicion de la hormiga
+ */
 int queueGetValueInPosition(queue* list, int position) {
     queueNode* node = (queueNode*) list->head;
     
@@ -327,6 +359,10 @@ int queueGetValueInPosition(queue* list, int position) {
     return (int) (__intptr_t) node->item;   
 }
 
+/**
+ * Funcion encargada de agregar una hormiga a la cola de listos
+ * Recibe la hormiga a agregar
+ */
 void addAntToQueue(ant_t* ant) {
     switch (ant->channel) {
         case 1:
@@ -364,6 +400,10 @@ void addAntToQueue(ant_t* ant) {
     return;
 }
 
+/**
+ * Funcion encargada de iniciar una hormiga
+ * Recibe como argumento la hormiga
+ */
 void* startAnt(void* arg) {
     ant_t* ant = (ant_t*) arg;
 
@@ -442,6 +482,10 @@ void* startAnt(void* arg) {
     return NULL;
 }
 
+/**
+ * Funcion encargada de mover la hormiga
+ * Recibe la hormiga
+ */
 int waze(ant_t *ant) {
 
     if(ant->dest == 1){
@@ -486,15 +530,15 @@ int waze(ant_t *ant) {
 
             if (ant->reorganizing !=0){
 
-                if (ant->posX < ant->finalDest < ant->posX+1){
+                if (ant->posX == ant->finalDest){
                     return 1;
                 }
                 else{
                     if(ant->posX < ant->finalDest){
-                        ant->posX += 2;
+                        ant->posX += 1;
                     }
                     else{
-                        ant->posX -= 2;
+                        ant->posX -= 1;
                     }
                 }
             }
@@ -597,15 +641,15 @@ int waze(ant_t *ant) {
         else if(ant->path == 2){
             if (ant->reorganizing !=0){
 
-                if (ant->posX < ant->finalDest < ant->posX+1){
+                if (ant->posX == ant->finalDest){
                     return 1;
                 }
                 else{
                     if(ant->posX < ant->finalDest){
-                        ant->posX += 2;
+                        ant->posX += 1;
                     }
                     else{
-                        ant->posX -= 2;
+                        ant->posX -= 1;
                     }
                 }
             }
